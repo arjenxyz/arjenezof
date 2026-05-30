@@ -2,18 +2,14 @@ import { Header } from "@/components/Header";
 import { HomeContent } from "@/components/HomeContent";
 import { SiteErrorPanel } from "@/components/SiteErrorPanel";
 import { getDatabaseErrorMessage } from "@/lib/db-errors";
-import { countNodes, getPublishedTree } from "@/lib/nodes";
-import { prisma } from "@/lib/prisma";
+import { countNodes, getPublishedFlatNodes, getPublishedTree } from "@/lib/nodes";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   try {
     const tree = await getPublishedTree();
-    const flatNodes = await prisma.thoughtNode.findMany({
-      where: { published: true },
-      orderBy: [{ sortOrder: "asc" }, { title: "asc" }],
-    });
+    const flatNodes = await getPublishedFlatNodes();
     const total = countNodes(tree);
 
     return (

@@ -12,65 +12,56 @@ Arjen Esen'in akıl denemelerini şema ve metin olarak paylaştığı kişisel d
 
 ## Supabase kurulumu
 
-1. [supabase.com](https://supabase.com) üzerinde ücretsiz proje oluştur
-2. **Project Settings → Database → Connection string** bölümüne git
-3. `.env` dosyasını oluştur:
-   ```bash
-   cp .env.example .env
-   ```
-4. İki bağlantı dizesini ekle:
-   - **`DATABASE_URL`** — **Transaction** modu, port **6543** (`?pgbouncer=true` ile). Uygulama ve Vercel bunu kullanır.
-   - **`DIRECT_URL`** — **Session** modu, port **5432**. `db:push` ve migration için.
+1. [supabase.com](https://supabase.com) üzerinde proje oluştur
+2. **SQL Editor** → `prisma/supabase-setup.sql` dosyasını yapıştır → **Run**
+3. **Project Settings → API** bölümünden:
+   - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
+   - **service_role** (gizli anahtar) → `SUPABASE_SERVICE_ROLE_KEY`
 
-Örnek:
 ```env
-DATABASE_URL="postgresql://postgres.xxxxx:ŞİFREN@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
-DIRECT_URL="postgresql://postgres.xxxxx:ŞİFREN@aws-0-eu-central-1.pooler.supabase.com:5432/postgres"
+NEXT_PUBLIC_SUPABASE_URL="https://xxxx.supabase.co"
+SUPABASE_SERVICE_ROLE_KEY="eyJ..."
 ADMIN_PASSWORD="güçlü-şifre"
 ADMIN_SECRET="en-az-32-karakter-rastgele-anahtar"
 ```
+
+> `service_role` anahtarını asla tarayıcıya veya `NEXT_PUBLIC_` ile ekleme. Sadece sunucu tarafında kullanılır.
 
 ## Yerel kurulum
 
 ```bash
 npm install
 cp .env.example .env
-# .env içine Supabase bağlantılarını yaz
-npm run db:push
-npm run db:seed
+# .env dosyasını doldur
 npm run dev
 ```
 
 Site: [http://localhost:3000](http://localhost:3000)  
 Admin: [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
 
-Supabase panelinden **Table Editor** ile `ThoughtNode` tablosunu da görebilirsin.
+## Vercel'e deploy
+
+1. GitHub reposunu Vercel'e bağla
+2. **Environment Variables** ekle:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `ADMIN_PASSWORD`
+   - `ADMIN_SECRET`
+3. Deploy et
+
+PostgreSQL connection string gerekmez — sadece Supabase URL + service_role key yeterli.
 
 ## Admin kullanımı
 
 1. `/admin/login` adresinden giriş yap
 2. **Yeni düşünce** ile kök veya alt dal ekle
-3. **Sonraki soru** alanına şemada görünecek soruyu yaz (örn. "Yaratıcı var mıdır?")
-4. **Dal etiketi** alanına üst düğümden gelen cevabı yaz (örn. "Evet", "Hayır")
+3. **Sonraki soru** alanına şemada görünecek soruyu yaz
+4. **Dal etiketi** alanına üst düğümden gelen cevabı yaz (örn. Evet, Hayır)
 5. **Üst düşünce** seçerek ağaca bağla
-
-## Vercel'e deploy
-
-1. Projeyi GitHub'a bağla ve Vercel'e import et
-2. Vercel **Environment Variables** ekle:
-   - `DATABASE_URL` — Supabase transaction pooler (6543)
-   - `DIRECT_URL` — Supabase session/direct (5432)
-   - `ADMIN_PASSWORD` — güçlü şifre
-   - `ADMIN_SECRET` — en az 32 karakter rastgele anahtar
-3. Deploy öncesi veya sonrası bir kez şemayı yükle:
-   ```bash
-   npm run db:push
-   npm run db:seed
-   ```
 
 ## Teknoloji
 
 - Next.js 16 (App Router)
-- Prisma + Supabase (PostgreSQL)
+- Supabase (PostgreSQL + REST API)
 - React Flow (şema görselleştirme)
 - Tailwind CSS

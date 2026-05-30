@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
-import { getUniqueSlug } from "@/lib/nodes";
-import { prisma } from "@/lib/prisma";
+import { createThoughtNode, getParentNode } from "@/lib/nodes";
 
 export async function POST(request: Request) {
   if (!(await isAuthenticated())) {
@@ -23,28 +22,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Başlık ve metin zorunludur." }, { status: 400 });
   }
 
-  const slug = await getUniqueSlug(body.title.trim());
   const parentId = body.parentId?.trim() || null;
 
   if (parentId) {
-    const parent = await prisma.thoughtNode.findUnique({ where: { id: parentId } });
+    const parent = await getParentNode(parentId);
     if (!parent) {
       return NextResponse.json({ error: "Üst düşünce bulunamadı." }, { status: 400 });
     }
   }
 
-  const node = await prisma.thoughtNode.create({
-    data: {
-      title: body.title.trim(),
-      slug,
-      content: body.content.trim(),
-      branchQuestion: body.branchQuestion?.trim() || null,
-      branchLabel: body.branchLabel?.trim() || null,
-      parentId,
-      tags: body.tags?.trim() ?? "",
-      sortOrder: body.sortOrder ?? 0,
-      published: body.published ?? true,
-    },
+  const node = await createThoughtNode({
+    title: body.title.trim(),
+    content: body.content.trim(),
+    branchQuestion: body.branchQuestion?.trim() || null,
+    branchLabel: body.branchLabel?.trim() || null,
+    parentId,
+    tags: body.tags?.trim() ?? "",
+    sortOrder: body.sortOrder ?? 0,
+    published: body.published ?? true,
   });
 
   return NextResponse.json(node, { status: 201 });

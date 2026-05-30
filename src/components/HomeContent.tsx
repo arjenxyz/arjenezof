@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import type { ThoughtNode } from "@/generated/prisma/client";
-import type { ThoughtNodeWithChildren } from "@/lib/nodes-shared";
+import type { ThoughtNodeRecord, ThoughtNodeWithChildren } from "@/lib/nodes-shared";
 import { ThoughtFlowChart } from "@/components/ThoughtFlowChart";
 import { ThoughtTreeList } from "@/components/ThoughtTreeList";
 
 type Props = {
-  flatNodes: ThoughtNode[];
+  flatNodes: ThoughtNodeRecord[];
   tree: ThoughtNodeWithChildren[];
 };
 

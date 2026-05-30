@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
-import { getUniqueSlug } from "@/lib/nodes";
-import { prisma } from "@/lib/prisma";
+import {
+  deleteThoughtNode,
+  getNodeById,
+  getParentNode,
+  updateThoughtNode,
+} from "@/lib/nodes";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -11,7 +15,7 @@ export async function PUT(request: Request, { params }: Params) {
   }
 
   const { id } = await params;
-  const existing = await prisma.thoughtNode.findUnique({ where: { id } });
+  const existing = await getNodeById(id);
   if (!existing) {
     return NextResponse.json({ error: "Düşünce bulunamadı." }, { status: 404 });
   }
@@ -37,22 +41,16 @@ export async function PUT(request: Request, { params }: Params) {
   }
 
   if (parentId) {
-    const parent = await prisma.thoughtNode.findUnique({ where: { id: parentId } });
+    const parent = await getParentNode(parentId);
     if (!parent) {
       return NextResponse.json({ error: "Üst düşünce bulunamadı." }, { status: 400 });
     }
   }
 
-  const slug =
-    existing.title === body.title.trim()
-      ? existing.slug
-      : await getUniqueSlug(body.title.trim(), id);
-
-  const node = await prisma.thoughtNode.update({
-    where: { id },
-    data: {
+  const node = await updateThoughtNode(
+    id,
+    {
       title: body.title.trim(),
-      slug,
       content: body.content.trim(),
       branchQuestion: body.branchQuestion?.trim() || null,
       branchLabel: body.branchLabel?.trim() || null,
@@ -61,7 +59,9 @@ export async function PUT(request: Request, { params }: Params) {
       sortOrder: body.sortOrder ?? 0,
       published: body.published ?? true,
     },
-  });
+    existing.slug,
+    existing.title,
+  );
 
   return NextResponse.json(node);
 }
@@ -72,11 +72,11 @@ export async function DELETE(_request: Request, { params }: Params) {
   }
 
   const { id } = await params;
-  const existing = await prisma.thoughtNode.findUnique({ where: { id } });
+  const existing = await getNodeById(id);
   if (!existing) {
     return NextResponse.json({ error: "Düşünce bulunamadı." }, { status: 404 });
   }
 
-  await prisma.thoughtNode.delete({ where: { id } });
+  await deleteThoughtNode(id);
   return NextResponse.json({ ok: true });
 }

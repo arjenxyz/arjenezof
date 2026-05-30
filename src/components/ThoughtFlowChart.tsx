@@ -12,10 +12,10 @@ import ReactFlow, {
 } from "reactflow";
 import dagre from "@dagrejs/dagre";
 import "reactflow/dist/style.css";
-import type { ThoughtNode } from "@/generated/prisma/client";
+import type { ThoughtNodeRecord } from "@/lib/nodes-shared";
 
 type Props = {
-  nodes: ThoughtNode[];
+  nodes: ThoughtNodeRecord[];
 };
 
 type LayoutConfig = {
@@ -25,7 +25,7 @@ type LayoutConfig = {
   ranksep: number;
 };
 
-function layoutElements(nodes: ThoughtNode[], config: LayoutConfig) {
+function layoutElements(nodes: ThoughtNodeRecord[], config: LayoutConfig) {
   const { nodeWidth, nodeHeight, nodesep, ranksep } = config;
   const graph = new dagre.graphlib.Graph();
   graph.setDefaultEdgeLabel(() => ({}));
