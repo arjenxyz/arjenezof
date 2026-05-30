@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/Header";
-import { HomeContent } from "@/components/HomeContent";
+import { TopicWritings } from "@/components/TopicWritings";
 import { SiteErrorPanel } from "@/components/SiteErrorPanel";
 import { getDatabaseErrorMessage } from "@/lib/db-errors";
-import { countNodes, getPublishedFlatNodesByTopic, getPublishedTreeByTopic } from "@/lib/nodes";
+import { getPublishedWritingsByTopic } from "@/lib/nodes";
 import { getTopicBySlug } from "@/lib/topics";
 
 export const dynamic = "force-dynamic";
@@ -35,9 +35,7 @@ export default async function TopicPage({ params }: Props) {
     const topic = await getTopicBySlug(slug);
     if (!topic) notFound();
 
-    const tree = await getPublishedTreeByTopic(topic.id);
-    const flatNodes = await getPublishedFlatNodesByTopic(topic.id);
-    const total = countNodes(tree);
+    const writings = await getPublishedWritingsByTopic(topic.id);
 
     return (
       <>
@@ -62,12 +60,12 @@ export default async function TopicPage({ params }: Props) {
                 {topic.description}
               </p>
             )}
-            {total > 0 && (
-              <p className="mt-2 text-xs text-stone-500 sm:text-sm">{total} düşünce düğümü</p>
+            {writings.length > 0 && (
+              <p className="mt-2 text-xs text-stone-500 sm:text-sm">{writings.length} metin</p>
             )}
           </section>
 
-          <HomeContent flatNodes={flatNodes} tree={tree} />
+          <TopicWritings writings={writings} />
         </main>
         <footer className="border-t border-stone-200/80 px-4 py-6 text-center text-xs text-stone-500 sm:py-8 sm:text-sm">
           © {new Date().getFullYear()} Arjen Esen — Bu düşüncelerde ne?

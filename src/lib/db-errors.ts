@@ -38,13 +38,14 @@ export function getDatabaseErrorMessage(error: unknown): SiteErrorContent {
     msg.includes("does not exist") ||
     msg.includes("relation") ||
     msg.includes("topic") ||
+    msg.includes("quote") ||
     msg.includes("thoughtnode") ||
     msg.includes("42p01")
   ) {
     return {
       title: "Veritabanı tablosu bulunamadı",
-      message: "Topic veya ThoughtNode tablosu henüz oluşturulmamış görünüyor.",
-      hint: "Yeni kurulum: prisma/supabase-setup.sql. Mevcut veritabanı: supabase/topics-migration.sql dosyasını Supabase SQL Editor'da çalıştır.",
+      message: "Topic, ThoughtNode veya Quote tablosu henüz oluşturulmamış görünüyor.",
+      hint: "Yeni kurulum: prisma/supabase-setup.sql. Mevcut veritabanı: supabase/topics-migration.sql ve supabase/writings-and-quotes-migration.sql dosyalarını Supabase SQL Editor'da çalıştır.",
     };
   }
 

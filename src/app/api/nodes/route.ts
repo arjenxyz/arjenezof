@@ -13,9 +13,8 @@ export async function POST(request: Request) {
     content?: string;
     topicId?: string;
     newTopic?: { title?: string; description?: string };
-    branchQuestion?: string;
-    branchLabel?: string;
     parentId?: string;
+    relatedIds?: string;
     tags?: string;
     sortOrder?: number;
     published?: boolean;
@@ -42,10 +41,10 @@ export async function POST(request: Request) {
   if (parentId) {
     const parent = await getParentNode(parentId);
     if (!parent) {
-      return NextResponse.json({ error: "Üst düşünce bulunamadı." }, { status: 400 });
+      return NextResponse.json({ error: "Devam metni bulunamadı." }, { status: 400 });
     }
     if (parent.topicId !== resolvedTopicId) {
-      return NextResponse.json({ error: "Üst düşünce aynı konuda olmalıdır." }, { status: 400 });
+      return NextResponse.json({ error: "Devam metni aynı konuda olmalıdır." }, { status: 400 });
     }
   }
 
@@ -53,9 +52,8 @@ export async function POST(request: Request) {
     title: body.title.trim(),
     content: body.content.trim(),
     topicId: resolvedTopicId,
-    branchQuestion: body.branchQuestion?.trim() || null,
-    branchLabel: body.branchLabel?.trim() || null,
     parentId,
+    relatedIds: body.relatedIds?.trim() ?? "",
     tags: body.tags?.trim() ?? "",
     sortOrder: body.sortOrder ?? 0,
     published: body.published ?? true,

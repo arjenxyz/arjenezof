@@ -2,28 +2,28 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-
-type TopicMode = "existing" | "new";
+import { formatRelatedIds, parseRelatedIds } from "@/lib/nodes-shared";
 
 type Props = {
   topics: { id: string; title: string }[];
-  parents: { id: string; title: string; topicId: string }[];
+  allWritings: { id: string; title: string; topicId: string }[];
   defaultTopicId?: string;
   initial?: {
     id: string;
     title: string;
     content: string;
-    branchQuestion: string;
-    branchLabel: string;
     parentId: string;
     topicId: string;
+    relatedIds: string;
     tags: string;
     sortOrder: number;
     published: boolean;
   };
 };
 
-export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Props) {
+type TopicMode = "existing" | "new";
+
+export function AdminNodeForm({ topics, allWritings, defaultTopicId, initial }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -39,6 +39,10 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
   const [topicId, setTopicId] = useState(initial?.topicId ?? defaultTopicId ?? topics[0]?.id ?? "");
   const [newTopicTitle, setNewTopicTitle] = useState("");
   const [newTopicDescription, setNewTopicDescription] = useState("");
+  const [relatedIds, setRelatedIds] = useState<string[]>(
+    initial ? parseRelatedIds(initial.relatedIds) : [],
+  );
+
   const fieldClass =
     "w-full rounded-lg border border-stone-300 px-3 py-3 text-base text-stone-900 outline-none focus:border-[#6b7f6a] sm:py-2 sm:text-sm";
   const buttonPrimaryClass =
@@ -46,16 +50,26 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
 
   const activeTopicId = topicMode === "existing" ? topicId : "";
 
-  const filteredParents = useMemo(
+  const continuesFromOptions = useMemo(
     () =>
-      parents.filter(
-        (parent) =>
-          topicMode === "existing" &&
-          parent.topicId === activeTopicId &&
-          parent.id !== initial?.id,
+      allWritings.filter(
+        (writing) =>
+          writing.id !== initial?.id &&
+          (topicMode === "new" || writing.topicId === activeTopicId),
       ),
-    [parents, topicMode, activeTopicId, initial?.id],
+    [allWritings, topicMode, activeTopicId, initial?.id],
   );
+
+  const relatedOptions = useMemo(
+    () => allWritings.filter((writing) => writing.id !== initial?.id),
+    [allWritings, initial?.id],
+  );
+
+  function toggleRelated(id: string) {
+    setRelatedIds((current) =>
+      current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
+    );
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -66,10 +80,9 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
     const payload = {
       title: String(formData.get("title") ?? ""),
       content: String(formData.get("content") ?? ""),
-      branchQuestion: String(formData.get("branchQuestion") ?? ""),
-      branchLabel: String(formData.get("branchLabel") ?? ""),
       parentId: String(formData.get("parentId") ?? ""),
       tags: String(formData.get("tags") ?? ""),
+      relatedIds: formatRelatedIds(relatedIds),
       sortOrder: Number(formData.get("sortOrder") ?? 0),
       published: formData.get("published") === "on",
       ...(topicMode === "new"
@@ -104,7 +117,7 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
 
   async function handleDelete() {
     if (!initial) return;
-    if (!confirm("Bu düşünceyi ve alt dallarını silmek istediğine emin misin?")) return;
+    if (!confirm("Bu metni silmek istediğine emin misin?")) return;
 
     setLoading(true);
     const response = await fetch(`/api/nodes/${initial.id}`, { method: "DELETE" });
@@ -123,8 +136,7 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
       <fieldset className="space-y-3 rounded-xl border border-stone-200 bg-stone-50/50 p-4">
         <legend className="px-1 text-sm font-medium text-stone-700">Konu</legend>
         <p className="text-xs leading-relaxed text-stone-500">
-          İstediğin herhangi bir konuyu yazabilirsin — din, kuşlar, uçmak, kahve… Önceden tanımlı
-          bir liste yok.
+          Metni hangi konu altında gruplayacağını seç veya yeni bir konu adı yaz.
         </p>
 
         <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
@@ -180,7 +192,7 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
                 value={newTopicDescription}
                 onChange={(event) => setNewTopicDescription(event.target.value)}
                 className={`${fieldClass} leading-relaxed`}
-                placeholder="Konu sayfasında görünecek kısa giriş… Boş bırakabilirsin."
+                placeholder="Konu sayfasında görünecek kısa giriş…"
               />
             </div>
           </div>
@@ -208,7 +220,7 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
 
       <div>
         <label htmlFor="title" className="mb-1 block text-sm font-medium text-stone-700">
-          Başlık / Soru
+          Başlık
         </label>
         <input
           id="title"
@@ -216,79 +228,46 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
           required
           defaultValue={initial?.title}
           className={fieldClass}
-          placeholder="Örn: Kanat eğrisi uçuşu nasıl etkiler?"
+          placeholder="Metnin başlığı"
         />
       </div>
 
       <div>
         <label htmlFor="content" className="mb-1 block text-sm font-medium text-stone-700">
-          Düşünce metni
+          Metin
         </label>
         <textarea
           id="content"
           name="content"
           required
-          rows={10}
+          rows={12}
           defaultValue={initial?.content}
           className={`${fieldClass} leading-relaxed`}
-          placeholder="Aklına geleni buraya yaz…"
+          placeholder="Denemeni veya düşünceni buraya yaz…"
         />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="branchQuestion" className="mb-1 block text-sm font-medium text-stone-700">
-            Sonraki soru (opsiyonel)
-          </label>
-          <input
-            id="branchQuestion"
-            name="branchQuestion"
-            defaultValue={initial?.branchQuestion}
-            className={fieldClass}
-            placeholder="Şemada görünecek sonraki soru"
-          />
-        </div>
-        <div>
-          <label htmlFor="branchLabel" className="mb-1 block text-sm font-medium text-stone-700">
-            Dal etiketi (opsiyonel)
-          </label>
-          <input
-            id="branchLabel"
-            name="branchLabel"
-            defaultValue={initial?.branchLabel}
-            className={fieldClass}
-            placeholder="Örn: Evet, Hayır"
-          />
-          <p className="mt-1 text-xs text-stone-500">
-            Üst düğümden bu düğüme giden cevabı ifade eder.
-          </p>
-        </div>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
           <label htmlFor="parentId" className="mb-1 block text-sm font-medium text-stone-700">
-            Üst düşünce (aynı konu)
+            Devam ettiği metin (opsiyonel)
           </label>
           <select
             id="parentId"
             name="parentId"
             defaultValue={initial?.parentId ?? ""}
             className={fieldClass}
-            disabled={topicMode === "new"}
           >
-            <option value="">Kök düşünce (en üst)</option>
-            {filteredParents.map((parent) => (
-              <option key={parent.id} value={parent.id}>
-                {parent.title}
+            <option value="">Bağımsız metin</option>
+            {continuesFromOptions.map((writing) => (
+              <option key={writing.id} value={writing.id}>
+                {writing.title}
               </option>
             ))}
           </select>
-          {topicMode === "new" && (
-            <p className="mt-1 text-xs text-stone-500">
-              Yeni konuda ilk düşünce kök olur. Sonra alt dallar ekleyebilirsin.
-            </p>
-          )}
+          <p className="mt-1 text-xs text-stone-500">
+            Bu metin seçilen metnin devamı olarak gösterilir.
+          </p>
         </div>
         <div>
           <label htmlFor="sortOrder" className="mb-1 block text-sm font-medium text-stone-700">
@@ -306,17 +285,46 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
 
       <div>
         <label htmlFor="tags" className="mb-1 block text-sm font-medium text-stone-700">
-          Etiketler (opsiyonel)
+          İlgi alanı etiketleri
         </label>
         <input
           id="tags"
           name="tags"
           defaultValue={initial?.tags}
           className={fieldClass}
-          placeholder="kuş, fizik, merak"
+          placeholder="kuş, fizik, merak, doğa"
         />
-        <p className="mt-1 text-xs text-stone-500">Virgülle ayır.</p>
+        <p className="mt-1 text-xs text-stone-500">
+          Virgülle ayır. Ziyaretçiler etiketlere göre benzer metinleri bulabilir.
+        </p>
       </div>
+
+      {relatedOptions.length > 0 && (
+        <fieldset className="rounded-xl border border-stone-200 p-4">
+          <legend className="px-1 text-sm font-medium text-stone-700">
+            Benzer metinler (opsiyonel)
+          </legend>
+          <p className="mb-3 text-xs text-stone-500">
+            Elle bağlamak istediğin metinleri seç. Etiketlerle otomatik öneriler de eklenir.
+          </p>
+          <div className="max-h-48 space-y-2 overflow-y-auto">
+            {relatedOptions.map((writing) => (
+              <label
+                key={writing.id}
+                className="flex min-h-[40px] cursor-pointer items-center gap-2 text-sm text-stone-700"
+              >
+                <input
+                  type="checkbox"
+                  checked={relatedIds.includes(writing.id)}
+                  onChange={() => toggleRelated(writing.id)}
+                  className="h-4 w-4 rounded border-stone-300"
+                />
+                {writing.title}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
 
       <label className="flex min-h-[44px] items-center gap-3 text-sm text-stone-700 touch-manipulation">
         <input

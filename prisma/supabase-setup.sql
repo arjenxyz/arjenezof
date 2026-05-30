@@ -31,6 +31,7 @@ CREATE TABLE "ThoughtNode" (
   "published"      BOOLEAN NOT NULL DEFAULT true,
   "parentId"       TEXT,
   "topicId"        TEXT NOT NULL,
+  "relatedIds"     TEXT NOT NULL DEFAULT '',
   "createdAt"      TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt"      TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT "ThoughtNode_pkey" PRIMARY KEY ("id")
@@ -88,7 +89,7 @@ VALUES
 -- Örnek düşünce ağacı (Din & inanç konusu)
 INSERT INTO "ThoughtNode" (
   "id", "title", "slug", "content", "branchQuestion", "branchLabel",
-  "sortOrder", "tags", "published", "parentId", "topicId", "createdAt", "updatedAt"
+  "sortOrder", "tags", "published", "parentId", "topicId", "relatedIds", "createdAt", "updatedAt"
 ) VALUES
 (
   'clroot00000000000000000001',
@@ -109,6 +110,7 @@ Not: Bu düşünceler zamanla değişebilir. Yanlış olabilir, eksik kalabilir 
   true,
   NULL,
   'cltopic000000000000000001',
+  '',
   NOW(),
   NOW()
 ),
@@ -129,6 +131,7 @@ Henüz bu yaratıcının kim olduğunu, tek mi çok mu olduğunu netleştirmedim
   true,
   'clroot00000000000000000001',
   'cltopic000000000000000001',
+  '',
   NOW(),
   NOW()
 ),
@@ -148,6 +151,7 @@ Anlam, insan zihninin dünyayla kurduğu ilişkide de doğabilir.',
   true,
   'clroot00000000000000000001',
   'cltopic000000000000000001',
+  '',
   NOW(),
   NOW()
 ),
@@ -165,6 +169,7 @@ derinden etkiler.',
   true,
   'clnode00000000000000000002',
   'cltopic000000000000000001',
+  '',
   NOW(),
   NOW()
 ),
@@ -181,6 +186,32 @@ veya bilinç öncesi bir zorunluluk. Bu yol daha soğuk ama daha evrensel gelebi
   true,
   'clnode00000000000000000002',
   'cltopic000000000000000001',
+  '',
+  NOW(),
+  NOW()
+);
+
+CREATE TABLE "Quote" (
+  "id"          TEXT NOT NULL,
+  "text"        TEXT NOT NULL,
+  "author"      TEXT NOT NULL DEFAULT '',
+  "sortOrder"   INTEGER NOT NULL DEFAULT 0,
+  "published"   BOOLEAN NOT NULL DEFAULT true,
+  "createdAt"   TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt"   TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "Quote_pkey" PRIMARY KEY ("id")
+);
+
+CREATE INDEX "Quote_published_idx" ON "Quote"("published");
+
+INSERT INTO "Quote" ("id", "text", "author", "sortOrder", "published", "createdAt", "updatedAt")
+VALUES
+(
+  'clquote000000000000000001',
+  'Düşünmek, cevap aramaktan önce soruyu taşımaktır.',
+  '',
+  0,
+  true,
   NOW(),
   NOW()
 );

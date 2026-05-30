@@ -1,16 +1,14 @@
 import { createSupabaseAdmin, TABLE } from "@/lib/supabase";
+import { discoverRelatedWritings } from "@/lib/discovery";
 import {
-  buildTree,
-  countNodes,
   formatDate,
   parseTags,
   slugify,
   type ThoughtNodeRecord,
-  type ThoughtNodeWithChildren,
 } from "@/lib/nodes-shared";
 
-export type { ThoughtNodeWithChildren, ThoughtNodeRecord as ThoughtNode };
-export { buildTree, countNodes, formatDate, parseTags, slugify };
+export type { ThoughtNodeRecord as ThoughtNode };
+export { formatDate, parseTags, slugify };
 
 type DbRow = {
   id: string;
@@ -21,6 +19,7 @@ type DbRow = {
   branchLabel: string | null;
   sortOrder: number;
   tags: string;
+  relatedIds: string | null;
   published: boolean;
   parentId: string | null;
   topicId: string;
@@ -28,9 +27,10 @@ type DbRow = {
   updatedAt: string;
 };
 
-export type ThoughtNodeDetail = ThoughtNodeRecord & {
-  parent: ThoughtNodeRecord | null;
-  children: ThoughtNodeRecord[];
+export type WritingDetail = ThoughtNodeRecord & {
+  continuesFrom: ThoughtNodeRecord | null;
+  continuations: ThoughtNodeRecord[];
+  relatedWritings: ThoughtNodeRecord[];
 };
 
 function mapNode(row: DbRow): ThoughtNodeRecord {
@@ -43,6 +43,7 @@ function mapNode(row: DbRow): ThoughtNodeRecord {
     branchLabel: row.branchLabel,
     sortOrder: row.sortOrder,
     tags: row.tags,
+    relatedIds: row.relatedIds ?? "",
     published: row.published,
     parentId: row.parentId,
     topicId: row.topicId,
@@ -53,7 +54,7 @@ function mapNode(row: DbRow): ThoughtNodeRecord {
 
 export async function getUniqueSlug(title: string, excludeId?: string) {
   const supabase = createSupabaseAdmin();
-  const base = slugify(title) || "dusunce";
+  const base = slugify(title) || "metin";
   let slug = base;
   let counter = 1;
 
@@ -65,12 +66,7 @@ export async function getUniqueSlug(title: string, excludeId?: string) {
   }
 }
 
-export async function getPublishedTreeByTopic(topicId: string) {
-  const nodes = await getPublishedFlatNodesByTopic(topicId);
-  return buildTree(nodes) as ThoughtNodeWithChildren[];
-}
-
-export async function getPublishedFlatNodesByTopic(topicId: string) {
+export async function getPublishedWritingsByTopic(topicId: string) {
   const supabase = createSupabaseAdmin();
   const { data, error } = await supabase
     .from(TABLE)
@@ -78,10 +74,30 @@ export async function getPublishedFlatNodesByTopic(topicId: string) {
     .eq("topicId", topicId)
     .eq("published", true)
     .order("sortOrder", { ascending: true })
-    .order("title", { ascending: true });
+    .order("updatedAt", { ascending: false });
 
   if (error) throw error;
   return ((data ?? []) as DbRow[]).map(mapNode);
+}
+
+export async function getAllPublishedWritings() {
+  const supabase = createSupabaseAdmin();
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select("*")
+    .eq("published", true)
+    .order("updatedAt", { ascending: false });
+
+  if (error) throw error;
+  return ((data ?? []) as DbRow[]).map(mapNode);
+}
+
+export async function getPublishedWritingsByTag(tag: string) {
+  const writings = await getAllPublishedWritings();
+  const needle = tag.toLowerCase();
+  return writings.filter((writing) =>
+    parseTags(writing.tags).some((item) => item.toLowerCase() === needle),
+  );
 }
 
 export async function getAllNodesByTopic(topicId: string) {
@@ -109,7 +125,7 @@ export async function getAllNodes() {
   return ((data ?? []) as DbRow[]).map(mapNode);
 }
 
-export async function getNodeBySlug(slug: string): Promise<ThoughtNodeDetail | null> {
+export async function getNodeBySlug(slug: string): Promise<WritingDetail | null> {
   const supabase = createSupabaseAdmin();
   const { data: node, error } = await supabase
     .from(TABLE)
@@ -123,7 +139,7 @@ export async function getNodeBySlug(slug: string): Promise<ThoughtNodeDetail | n
 
   const mapped = mapNode(node as DbRow);
 
-  const { data: children, error: childrenError } = await supabase
+  const { data: continuations, error: continuationsError } = await supabase
     .from(TABLE)
     .select("*")
     .eq("parentId", mapped.id)
@@ -131,9 +147,9 @@ export async function getNodeBySlug(slug: string): Promise<ThoughtNodeDetail | n
     .order("sortOrder", { ascending: true })
     .order("title", { ascending: true });
 
-  if (childrenError) throw childrenError;
+  if (continuationsError) throw continuationsError;
 
-  let parent: ThoughtNodeRecord | null = null;
+  let continuesFrom: ThoughtNodeRecord | null = null;
   if (mapped.parentId) {
     const { data: parentRow, error: parentError } = await supabase
       .from(TABLE)
@@ -141,13 +157,17 @@ export async function getNodeBySlug(slug: string): Promise<ThoughtNodeDetail | n
       .eq("id", mapped.parentId)
       .maybeSingle();
     if (parentError) throw parentError;
-    parent = parentRow ? mapNode(parentRow as DbRow) : null;
+    continuesFrom = parentRow ? mapNode(parentRow as DbRow) : null;
   }
+
+  const allPublished = await getAllPublishedWritings();
+  const relatedWritings = discoverRelatedWritings(mapped, allPublished);
 
   return {
     ...mapped,
-    parent,
-    children: ((children ?? []) as DbRow[]).map(mapNode),
+    continuesFrom,
+    continuations: ((continuations ?? []) as DbRow[]).map(mapNode),
+    relatedWritings,
   };
 }
 
@@ -169,9 +189,8 @@ type NodeInput = {
   title: string;
   content: string;
   topicId: string;
-  branchQuestion?: string | null;
-  branchLabel?: string | null;
   parentId?: string | null;
+  relatedIds?: string;
   tags?: string;
   sortOrder?: number;
   published?: boolean;
@@ -190,9 +209,10 @@ export async function createThoughtNode(input: NodeInput) {
       slug,
       content: input.content,
       topicId: input.topicId,
-      branchQuestion: input.branchQuestion ?? null,
-      branchLabel: input.branchLabel ?? null,
+      branchQuestion: null,
+      branchLabel: null,
       parentId: input.parentId ?? null,
+      relatedIds: input.relatedIds ?? "",
       tags: input.tags ?? "",
       sortOrder: input.sortOrder ?? 0,
       published: input.published ?? true,
@@ -223,9 +243,10 @@ export async function updateThoughtNode(
       slug,
       content: input.content,
       topicId: input.topicId,
-      branchQuestion: input.branchQuestion ?? null,
-      branchLabel: input.branchLabel ?? null,
+      branchQuestion: null,
+      branchLabel: null,
       parentId: input.parentId ?? null,
+      relatedIds: input.relatedIds ?? "",
       tags: input.tags ?? "",
       sortOrder: input.sortOrder ?? 0,
       published: input.published ?? true,

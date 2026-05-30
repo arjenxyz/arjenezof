@@ -7,6 +7,7 @@ export type ThoughtNodeRecord = {
   branchLabel: string | null;
   sortOrder: number;
   tags: string;
+  relatedIds: string;
   published: boolean;
   parentId: string | null;
   topicId: string;
@@ -24,6 +25,18 @@ export function parseTags(tags: string): string[] {
     .split(",")
     .map((tag) => tag.trim())
     .filter(Boolean);
+}
+
+export function parseRelatedIds(relatedIds: string): string[] {
+  if (!relatedIds.trim()) return [];
+  return relatedIds
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+}
+
+export function formatRelatedIds(ids: string[]): string {
+  return ids.filter(Boolean).join(",");
 }
 
 export function slugify(text: string): string {

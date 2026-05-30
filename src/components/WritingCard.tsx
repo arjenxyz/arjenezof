@@ -1,0 +1,34 @@
+import Link from "next/link";
+import type { ThoughtNodeRecord } from "@/lib/nodes-shared";
+import { formatDate, parseTags } from "@/lib/nodes-shared";
+
+type Props = {
+  writing: ThoughtNodeRecord;
+};
+
+export function WritingCard({ writing }: Props) {
+  const tags = parseTags(writing.tags);
+
+  return (
+    <article className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition hover:border-[#8fa38e] hover:shadow-md sm:p-5">
+      <Link href={`/dusunce/${writing.slug}`} className="group block touch-manipulation">
+        <h3 className="font-serif text-lg leading-snug text-stone-900 group-hover:text-[#4a5d49] sm:text-xl">
+          {writing.title}
+        </h3>
+        <p className="mt-2 line-clamp-4 text-sm leading-relaxed text-stone-600">{writing.content}</p>
+      </Link>
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-stone-500">
+        <span>{formatDate(writing.updatedAt)}</span>
+        {tags.map((tag) => (
+          <Link
+            key={tag}
+            href={`/etiket/${encodeURIComponent(tag)}`}
+            className="rounded-full bg-stone-100 px-2 py-0.5 text-stone-600 transition hover:bg-[#eef2ed] hover:text-[#4a5d49]"
+          >
+            {tag}
+          </Link>
+        ))}
+      </div>
+    </article>
+  );
+}

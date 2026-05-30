@@ -1,21 +1,23 @@
 # Bu düşüncelerde ne?
 
-Arjen Esen'in akıl denemelerini şema ve metin olarak paylaştığı kişisel düşünce sitesi.
+Arjen Esen'in akıl denemelerini metin olarak paylaştığı kişisel yazı sitesi.
 
 ## Özellikler
 
-- **Konular:** Her konunun kendi giriş metni, şeması ve düşünce ağacı
-- **Şema görünümü:** Konu bazında interaktif harita (salt okunur)
-- **Liste görünümü:** Hiyerarşik metin listesi
-- **Detay sayfaları:** Her düşüncenin tam metni, etiketleri ve alt dalları
-- **Admin paneli:** Konu ve düşünce ekleme, düzenleme, silme
+- **Konular:** Metinlerini konu konu grupla (serbest konu adı)
+- **Etiketler:** İlgi alanlarına göre keşif (`/etiket/kuş` gibi)
+- **Bağlantılar:** Metin devamı, benzer okumalar (elle + otomatik etiket eşleşmesi)
+- **Hakkında sözleri:** Altta rastgele dönen sözler (admin panelden yönetilir)
+- **Admin paneli:** Konu, metin ve söz yönetimi
 - **Türkçe arayüz**
 
 ## Supabase kurulumu
 
 **Sıfırdan kurulum:** SQL Editor → `prisma/supabase-setup.sql` → Run
 
-**Mevcut veritabanına konu desteği eklemek:** `supabase/topics-migration.sql` → Run
+**Mevcut veritabanı güncellemeleri:**
+1. `supabase/topics-migration.sql` (konu desteği)
+2. `supabase/writings-and-quotes-migration.sql` (relatedIds + Quote tablosu)
 
 **Project Settings → API** bölümünden:
    - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
@@ -52,20 +54,17 @@ Admin: [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
    - `ADMIN_SECRET`
 3. Deploy et
 
-PostgreSQL connection string gerekmez — sadece Supabase URL + service_role key yeterli.
-
 ## Admin kullanımı
 
 1. `/admin/login` adresinden giriş yap
-2. **Konular** bölümünden yeni konu ekle (başlık + açıklama metni)
-3. **Yeni düşünce** ile konuya kök veya alt dal ekle
-4. **Sonraki soru** alanına şemada görünecek soruyu yaz
-5. **Dal etiketi** alanına üst düğümden gelen cevabı yaz (örn. Evet, Hayır)
-6. **Üst düşünce** aynı konudan seçilmelidir
+2. **Konular** — konu başlığı ve giriş metni
+3. **+ Yeni metin** — konu, başlık, metin, etiketler
+4. **Devam ettiği metin** — seri/devam bağlantısı (opsiyonel)
+5. **Benzer metinler** — elle bağlantı (etiketler otomatik öneri de üretir)
+6. **Sözler** — Hakkında sayfasındaki dönen sözler
 
 ## Teknoloji
 
 - Next.js 16 (App Router)
 - Supabase (PostgreSQL + REST API)
-- React Flow (şema görselleştirme)
 - Tailwind CSS

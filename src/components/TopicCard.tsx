@@ -21,7 +21,7 @@ export function TopicCard({ topic, nodeCount }: Props) {
         </p>
       )}
       <p className="mt-4 text-xs text-stone-500 sm:text-sm">
-        {nodeCount > 0 ? `${nodeCount} düşünce · Şema ve metinler →` : "Oku →"}
+        {nodeCount > 0 ? `${nodeCount} metin →` : "Oku →"}
       </p>
     </Link>
   );

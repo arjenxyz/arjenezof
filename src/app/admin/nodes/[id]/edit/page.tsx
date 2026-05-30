@@ -14,7 +14,7 @@ export default async function EditNodePage({ params }: Props) {
   if (!authed) redirect("/admin/login");
 
   const { id } = await params;
-  const [node, topics, parents] = await Promise.all([
+  const [node, topics, allWritings] = await Promise.all([
     getNodeById(id),
     getAllTopics(),
     getAllNodes(),
@@ -26,11 +26,11 @@ export default async function EditNodePage({ params }: Props) {
       <Link href="/admin" className="inline-flex min-h-[44px] items-center text-sm text-stone-500 hover:text-stone-800 touch-manipulation">
         ← Panele dön
       </Link>
-      <h1 className="mt-3 font-serif text-2xl text-stone-900 sm:mt-4 sm:text-3xl">Düşünceyi düzenle</h1>
+      <h1 className="mt-3 font-serif text-2xl text-stone-900 sm:mt-4 sm:text-3xl">Metni düzenle</h1>
       <div className="mt-6 rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:mt-8 sm:p-6">
         <AdminNodeForm
           topics={topics.map((t) => ({ id: t.id, title: t.title }))}
-          parents={parents.map((item) => ({
+          allWritings={allWritings.map((item) => ({
             id: item.id,
             title: item.title,
             topicId: item.topicId,
@@ -39,10 +39,9 @@ export default async function EditNodePage({ params }: Props) {
             id: node.id,
             title: node.title,
             content: node.content,
-            branchQuestion: node.branchQuestion ?? "",
-            branchLabel: node.branchLabel ?? "",
             parentId: node.parentId ?? "",
             topicId: node.topicId,
+            relatedIds: node.relatedIds,
             tags: node.tags,
             sortOrder: node.sortOrder,
             published: node.published,

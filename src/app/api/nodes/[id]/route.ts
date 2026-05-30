@@ -18,7 +18,7 @@ export async function PUT(request: Request, { params }: Params) {
   const { id } = await params;
   const existing = await getNodeById(id);
   if (!existing) {
-    return NextResponse.json({ error: "Düşünce bulunamadı." }, { status: 404 });
+    return NextResponse.json({ error: "Metin bulunamadı." }, { status: 404 });
   }
 
   const body = (await request.json()) as {
@@ -26,9 +26,8 @@ export async function PUT(request: Request, { params }: Params) {
     content?: string;
     topicId?: string;
     newTopic?: { title?: string; description?: string };
-    branchQuestion?: string;
-    branchLabel?: string;
     parentId?: string;
+    relatedIds?: string;
     tags?: string;
     sortOrder?: number;
     published?: boolean;
@@ -46,16 +45,16 @@ export async function PUT(request: Request, { params }: Params) {
 
   const parentId = body.parentId?.trim() || null;
   if (parentId === id) {
-    return NextResponse.json({ error: "Bir düşünce kendi üstü olamaz." }, { status: 400 });
+    return NextResponse.json({ error: "Bir metin kendi devamı olamaz." }, { status: 400 });
   }
 
   if (parentId) {
     const parent = await getParentNode(parentId);
     if (!parent) {
-      return NextResponse.json({ error: "Üst düşünce bulunamadı." }, { status: 400 });
+      return NextResponse.json({ error: "Devam metni bulunamadı." }, { status: 400 });
     }
     if (parent.topicId !== resolvedTopicId) {
-      return NextResponse.json({ error: "Üst düşünce aynı konuda olmalıdır." }, { status: 400 });
+      return NextResponse.json({ error: "Devam metni aynı konuda olmalıdır." }, { status: 400 });
     }
   }
 
@@ -65,9 +64,8 @@ export async function PUT(request: Request, { params }: Params) {
       title: body.title.trim(),
       content: body.content.trim(),
       topicId: resolvedTopicId,
-      branchQuestion: body.branchQuestion?.trim() || null,
-      branchLabel: body.branchLabel?.trim() || null,
       parentId,
+      relatedIds: body.relatedIds?.trim() ?? "",
       tags: body.tags?.trim() ?? "",
       sortOrder: body.sortOrder ?? 0,
       published: body.published ?? true,
@@ -87,7 +85,7 @@ export async function DELETE(_request: Request, { params }: Params) {
   const { id } = await params;
   const existing = await getNodeById(id);
   if (!existing) {
-    return NextResponse.json({ error: "Düşünce bulunamadı." }, { status: 404 });
+    return NextResponse.json({ error: "Metin bulunamadı." }, { status: 404 });
   }
 
   await deleteThoughtNode(id);
