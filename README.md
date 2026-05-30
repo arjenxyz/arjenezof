@@ -10,11 +10,32 @@ Arjen Esen'in akıl denemelerini şema ve metin olarak paylaştığı kişisel d
 - **Admin paneli:** Sadece sen düşünce ekleyebilir, düzenleyebilir ve silebilirsin
 - **Türkçe arayüz**
 
+## Supabase kurulumu
+
+1. [supabase.com](https://supabase.com) üzerinde ücretsiz proje oluştur
+2. **Project Settings → Database → Connection string** bölümüne git
+3. `.env` dosyasını oluştur:
+   ```bash
+   cp .env.example .env
+   ```
+4. İki bağlantı dizesini ekle:
+   - **`DATABASE_URL`** — **Transaction** modu, port **6543** (`?pgbouncer=true` ile). Uygulama ve Vercel bunu kullanır.
+   - **`DIRECT_URL`** — **Session** modu, port **5432**. `db:push` ve migration için.
+
+Örnek:
+```env
+DATABASE_URL="postgresql://postgres.xxxxx:ŞİFREN@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.xxxxx:ŞİFREN@aws-0-eu-central-1.pooler.supabase.com:5432/postgres"
+ADMIN_PASSWORD="güçlü-şifre"
+ADMIN_SECRET="en-az-32-karakter-rastgele-anahtar"
+```
+
 ## Yerel kurulum
 
 ```bash
 npm install
 cp .env.example .env
+# .env içine Supabase bağlantılarını yaz
 npm run db:push
 npm run db:seed
 npm run dev
@@ -23,7 +44,7 @@ npm run dev
 Site: [http://localhost:3000](http://localhost:3000)  
 Admin: [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
 
-Varsayılan şifre `.env` dosyasındaki `ADMIN_PASSWORD` değeridir.
+Supabase panelinden **Table Editor** ile `ThoughtNode` tablosunu da görebilirsin.
 
 ## Admin kullanımı
 
@@ -35,23 +56,21 @@ Varsayılan şifre `.env` dosyasındaki `ADMIN_PASSWORD` değeridir.
 
 ## Vercel'e deploy
 
-SQLite Vercel'de kalıcı çalışmaz. Üretim için ücretsiz **Neon PostgreSQL** önerilir:
-
-1. [neon.tech](https://neon.tech) üzerinde veritabanı oluştur
-2. `prisma/schema.prisma` içinde `provider = "postgresql"` yap
-3. Vercel ortam değişkenlerini ayarla:
-   - `DATABASE_URL` — Neon bağlantı dizesi
+1. Projeyi GitHub'a bağla ve Vercel'e import et
+2. Vercel **Environment Variables** ekle:
+   - `DATABASE_URL` — Supabase transaction pooler (6543)
+   - `DIRECT_URL` — Supabase session/direct (5432)
    - `ADMIN_PASSWORD` — güçlü şifre
    - `ADMIN_SECRET` — en az 32 karakter rastgele anahtar
-4. Deploy sonrası bir kez migration çalıştır:
+3. Deploy öncesi veya sonrası bir kez şemayı yükle:
    ```bash
-   npx prisma db push
-   npx tsx prisma/seed.ts
+   npm run db:push
+   npm run db:seed
    ```
 
 ## Teknoloji
 
 - Next.js 16 (App Router)
-- Prisma + SQLite (yerel) / PostgreSQL (üretim)
+- Prisma + Supabase (PostgreSQL)
 - React Flow (şema görselleştirme)
 - Tailwind CSS

@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { Header } from "@/components/Header";
 import { formatDate, getNodeBySlug, parseTags } from "@/lib/nodes";
 
+export const dynamic = "force-dynamic";
+
 type Props = {
   params: Promise<{ slug: string }>;
 };
