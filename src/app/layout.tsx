@@ -15,11 +15,11 @@ const sans = Source_Sans_3({
 
 export const metadata: Metadata = {
   title: {
-    default: "Bu düşüncelerde ne? | Arjen Esen",
+    default: "Bu düşüncelerde ne? | Arjen",
     template: "%s | Bu düşüncelerde ne?",
   },
   description:
-    "Arjen Esen'in akıl denemeleri: din, tanrı, yaşam, doğa ve varoluş üzerine düşünce şemaları.",
+    "Arjen'in akıl denemeleri: din, tanrı, yaşam, doğa ve varoluş üzerine düşünceler.",
 };
 
 export const viewport = {

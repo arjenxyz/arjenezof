@@ -12,7 +12,7 @@ export function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-5">
         <Link href="/" className="group min-w-0 flex-1">
           <p className="font-serif text-[10px] uppercase tracking-[0.2em] text-stone-500 sm:text-xs sm:tracking-[0.25em]">
-            Arjen Esen
+            Arjen
           </p>
           <h1 className="truncate font-serif text-lg text-stone-900 transition group-hover:text-[#4a5d49] sm:text-2xl">
             Bu düşüncelerde ne?

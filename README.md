@@ -1,6 +1,6 @@
 # Bu düşüncelerde ne?
 
-Arjen Esen'in akıl denemelerini metin olarak paylaştığı kişisel yazı sitesi.
+Arjen'in akıl denemelerini metin olarak paylaştığı kişisel yazı sitesi.
 
 ## Özellikler
 

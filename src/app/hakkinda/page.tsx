@@ -22,7 +22,7 @@ export default async function AboutPage() {
           <h1 className="font-serif text-2xl text-stone-900 sm:text-4xl">Hakkında</h1>
           <div className="mt-5 space-y-4 text-sm leading-relaxed text-stone-700 sm:mt-6 sm:text-base">
             <p>
-              <strong>Bu düşüncelerde ne?</strong>, Arjen Esen&apos;in kendi kendine sorduğu
+              <strong>Bu düşüncelerde ne?</strong>, Arjen&apos;in kendi kendine sorduğu
               soruların ve akıl denemelerinin paylaşıldığı kişisel bir yazı alanıdır. Konular
               serbestçe belirlenir; metinler zamanla değişebilir, yanlış olabilir, eksik kalabilir.
             </p>
