@@ -9,6 +9,7 @@ export type ThoughtNodeRecord = {
   tags: string;
   published: boolean;
   parentId: string | null;
+  topicId: string;
   createdAt: Date;
   updatedAt: Date;
 };

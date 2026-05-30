@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { SiteErrorPanel } from "@/components/SiteErrorPanel";
 import { getDatabaseErrorMessage } from "@/lib/db-errors";
 import { formatDate, getNodeBySlug, parseTags } from "@/lib/nodes";
+import { getTopicById } from "@/lib/topics";
 
 export const dynamic = "force-dynamic";
 
@@ -33,18 +34,29 @@ export default async function ThoughtDetailPage({ params }: Props) {
     const node = await getNodeBySlug(slug);
     if (!node) notFound();
 
+    const topic = await getTopicById(node.topicId);
     const tags = parseTags(node.tags);
 
   return (
     <>
       <Header />
       <main className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
-        <Link
-          href="/"
-          className="inline-flex min-h-[44px] items-center text-sm text-stone-500 transition hover:text-stone-800 touch-manipulation"
-        >
-          ← Şemaya dön
-        </Link>
+        <nav className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-stone-500">
+          <Link href="/" className="transition hover:text-stone-800 touch-manipulation">
+            Konular
+          </Link>
+          {topic && (
+            <>
+              <span aria-hidden="true">/</span>
+              <Link
+                href={`/konu/${topic.slug}`}
+                className="transition hover:text-stone-800 touch-manipulation"
+              >
+                {topic.title}
+              </Link>
+            </>
+          )}
+        </nav>
 
         {node.branchLabel && (
           <span className="mt-4 inline-block rounded-full bg-[#eef2ed] px-3 py-1 text-xs font-medium text-[#4a5d49] sm:mt-6">

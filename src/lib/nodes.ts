@@ -23,6 +23,7 @@ type DbRow = {
   tags: string;
   published: boolean;
   parentId: string | null;
+  topicId: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -44,6 +45,7 @@ function mapNode(row: DbRow): ThoughtNodeRecord {
     tags: row.tags,
     published: row.published,
     parentId: row.parentId,
+    topicId: row.topicId,
     createdAt: new Date(row.createdAt),
     updatedAt: new Date(row.updatedAt),
   };
@@ -63,17 +65,31 @@ export async function getUniqueSlug(title: string, excludeId?: string) {
   }
 }
 
-export async function getPublishedTree() {
-  const nodes = await getPublishedFlatNodes();
+export async function getPublishedTreeByTopic(topicId: string) {
+  const nodes = await getPublishedFlatNodesByTopic(topicId);
   return buildTree(nodes) as ThoughtNodeWithChildren[];
 }
 
-export async function getPublishedFlatNodes() {
+export async function getPublishedFlatNodesByTopic(topicId: string) {
   const supabase = createSupabaseAdmin();
   const { data, error } = await supabase
     .from(TABLE)
     .select("*")
+    .eq("topicId", topicId)
     .eq("published", true)
+    .order("sortOrder", { ascending: true })
+    .order("title", { ascending: true });
+
+  if (error) throw error;
+  return ((data ?? []) as DbRow[]).map(mapNode);
+}
+
+export async function getAllNodesByTopic(topicId: string) {
+  const supabase = createSupabaseAdmin();
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select("*")
+    .eq("topicId", topicId)
     .order("sortOrder", { ascending: true })
     .order("title", { ascending: true });
 
@@ -152,6 +168,7 @@ export async function getParentNode(id: string) {
 type NodeInput = {
   title: string;
   content: string;
+  topicId: string;
   branchQuestion?: string | null;
   branchLabel?: string | null;
   parentId?: string | null;
@@ -172,6 +189,7 @@ export async function createThoughtNode(input: NodeInput) {
       title: input.title,
       slug,
       content: input.content,
+      topicId: input.topicId,
       branchQuestion: input.branchQuestion ?? null,
       branchLabel: input.branchLabel ?? null,
       parentId: input.parentId ?? null,
@@ -188,7 +206,12 @@ export async function createThoughtNode(input: NodeInput) {
   return mapNode(data as DbRow);
 }
 
-export async function updateThoughtNode(id: string, input: NodeInput, existingSlug: string, existingTitle: string) {
+export async function updateThoughtNode(
+  id: string,
+  input: NodeInput,
+  existingSlug: string,
+  existingTitle: string,
+) {
   const supabase = createSupabaseAdmin();
   const slug =
     existingTitle === input.title ? existingSlug : await getUniqueSlug(input.title, id);
@@ -199,6 +222,7 @@ export async function updateThoughtNode(id: string, input: NodeInput, existingSl
       title: input.title,
       slug,
       content: input.content,
+      topicId: input.topicId,
       branchQuestion: input.branchQuestion ?? null,
       branchLabel: input.branchLabel ?? null,
       parentId: input.parentId ?? null,

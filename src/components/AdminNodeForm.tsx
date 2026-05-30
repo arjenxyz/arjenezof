@@ -1,10 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 type Props = {
-  parents: { id: string; title: string }[];
+  topics: { id: string; title: string }[];
+  parents: { id: string; title: string; topicId: string }[];
+  defaultTopicId?: string;
   initial?: {
     id: string;
     title: string;
@@ -12,20 +14,27 @@ type Props = {
     branchQuestion: string;
     branchLabel: string;
     parentId: string;
+    topicId: string;
     tags: string;
     sortOrder: number;
     published: boolean;
   };
 };
 
-export function AdminNodeForm({ parents, initial }: Props) {
+export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [topicId, setTopicId] = useState(initial?.topicId ?? defaultTopicId ?? topics[0]?.id ?? "");
   const fieldClass =
     "w-full rounded-lg border border-stone-300 px-3 py-3 text-base text-stone-900 outline-none focus:border-[#6b7f6a] sm:py-2 sm:text-sm";
   const buttonPrimaryClass =
     "rounded-lg bg-[#4a5d49] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#3d4d3c] disabled:opacity-60 touch-manipulation sm:py-2";
+
+  const filteredParents = useMemo(
+    () => parents.filter((parent) => parent.topicId === topicId && parent.id !== initial?.id),
+    [parents, topicId, initial?.id],
+  );
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -36,6 +45,7 @@ export function AdminNodeForm({ parents, initial }: Props) {
     const payload = {
       title: String(formData.get("title") ?? ""),
       content: String(formData.get("content") ?? ""),
+      topicId: String(formData.get("topicId") ?? ""),
       branchQuestion: String(formData.get("branchQuestion") ?? ""),
       branchLabel: String(formData.get("branchLabel") ?? ""),
       parentId: String(formData.get("parentId") ?? ""),
@@ -82,6 +92,26 @@ export function AdminNodeForm({ parents, initial }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      <div>
+        <label htmlFor="topicId" className="mb-1 block text-sm font-medium text-stone-700">
+          Konu
+        </label>
+        <select
+          id="topicId"
+          name="topicId"
+          required
+          value={topicId}
+          onChange={(event) => setTopicId(event.target.value)}
+          className={fieldClass}
+        >
+          {topics.map((topic) => (
+            <option key={topic.id} value={topic.id}>
+              {topic.title}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div>
         <label htmlFor="title" className="mb-1 block text-sm font-medium text-stone-700">
           Başlık / Soru
@@ -144,7 +174,7 @@ export function AdminNodeForm({ parents, initial }: Props) {
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="parentId" className="mb-1 block text-sm font-medium text-stone-700">
-            Üst düşünce
+            Üst düşünce (aynı konu)
           </label>
           <select
             id="parentId"
@@ -153,13 +183,11 @@ export function AdminNodeForm({ parents, initial }: Props) {
             className={fieldClass}
           >
             <option value="">Kök düşünce (en üst)</option>
-            {parents
-              .filter((parent) => parent.id !== initial?.id)
-              .map((parent) => (
-                <option key={parent.id} value={parent.id}>
-                  {parent.title}
-                </option>
-              ))}
+            {filteredParents.map((parent) => (
+              <option key={parent.id} value={parent.id}>
+                {parent.title}
+              </option>
+            ))}
           </select>
         </div>
         <div>
@@ -203,11 +231,7 @@ export function AdminNodeForm({ parents, initial }: Props) {
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <div className="flex flex-wrap gap-3">
-        <button
-          type="submit"
-          disabled={loading}
-          className={buttonPrimaryClass}
-        >
+        <button type="submit" disabled={loading} className={buttonPrimaryClass}>
           {loading ? "Kaydediliyor..." : initial ? "Güncelle" : "Oluştur"}
         </button>
         {initial && (

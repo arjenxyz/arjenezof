@@ -4,15 +4,16 @@ import { AdminLogoutButton } from "@/components/AdminLogoutButton";
 import { SiteErrorPanel } from "@/components/SiteErrorPanel";
 import { isAuthenticated } from "@/lib/auth";
 import { getDatabaseErrorMessage } from "@/lib/db-errors";
-import { buildTree, getAllNodes } from "@/lib/nodes";
+import { getAllNodes } from "@/lib/nodes";
+import { getAllTopics } from "@/lib/topics";
 
 export default async function AdminDashboardPage() {
   const authed = await isAuthenticated();
   if (!authed) redirect("/admin/login");
 
   try {
-    const nodes = await getAllNodes();
-    const tree = buildTree(nodes);
+    const [topics, nodes] = await Promise.all([getAllTopics(), getAllNodes()]);
+    const topicById = new Map(topics.map((topic) => [topic.id, topic]));
 
   return (
     <main className="mx-auto min-h-screen max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
@@ -23,7 +24,7 @@ export default async function AdminDashboardPage() {
           </p>
           <h1 className="mt-2 font-serif text-2xl text-stone-900 sm:text-3xl">Düşünce ağacı</h1>
           <p className="mt-2 text-sm text-stone-600">
-            Yeni sorular ekleyebilir, dalları güncelleyebilir veya silebilirsin.
+            Konulara göre düşünceleri yönet. Her düşünce bir konuya bağlıdır.
           </p>
         </div>
         <div className="flex flex-wrap gap-2 sm:gap-3">
@@ -32,6 +33,12 @@ export default async function AdminDashboardPage() {
             className="flex-1 rounded-lg border border-stone-300 px-4 py-2.5 text-center text-sm text-stone-700 transition hover:bg-stone-50 touch-manipulation sm:flex-none"
           >
             Siteyi gör
+          </Link>
+          <Link
+            href="/admin/topics"
+            className="flex-1 rounded-lg border border-stone-300 px-4 py-2.5 text-center text-sm text-stone-700 transition hover:bg-stone-50 touch-manipulation sm:flex-none"
+          >
+            Konular
           </Link>
           <Link
             href="/admin/nodes/new"
@@ -56,6 +63,9 @@ export default async function AdminDashboardPage() {
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
+                  <p className="text-xs text-stone-500">
+                    {topicById.get(node.topicId)?.title ?? "—"}
+                  </p>
                   <p className="font-medium text-stone-900">{node.title}</p>
                   {node.branchQuestion && (
                     <p className="mt-1 text-xs text-stone-500">→ {node.branchQuestion}</p>
@@ -89,6 +99,7 @@ export default async function AdminDashboardPage() {
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-stone-200 bg-stone-50 text-stone-600">
             <tr>
+              <th className="px-4 py-3 font-medium">Konu</th>
               <th className="px-4 py-3 font-medium">Başlık</th>
               <th className="px-4 py-3 font-medium">Dal</th>
               <th className="px-4 py-3 font-medium">Durum</th>
@@ -98,13 +109,16 @@ export default async function AdminDashboardPage() {
           <tbody>
             {nodes.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-stone-500">
+                <td colSpan={5} className="px-4 py-8 text-center text-stone-500">
                   Henüz düşünce yok. İlk düşünceni ekle.
                 </td>
               </tr>
             ) : (
               nodes.map((node) => (
                 <tr key={node.id} className="border-b border-stone-100 last:border-0">
+                  <td className="px-4 py-3 text-stone-600">
+                    {topicById.get(node.topicId)?.title ?? "—"}
+                  </td>
                   <td className="px-4 py-3">
                     <p className="font-medium text-stone-900">{node.title}</p>
                     {node.branchQuestion && (
@@ -138,9 +152,10 @@ export default async function AdminDashboardPage() {
         </table>
       </div>
 
-      {tree.length > 0 && (
+      {nodes.length > 0 && (
         <p className="mt-4 text-xs text-stone-500">
-          Toplam {nodes.length} düğüm. Alt dallar silindiğinde üst düşünceyle birlikte kaldırılır.
+          Toplam {nodes.length} düğüm, {topics.length} konu. Konu silindiğinde içindeki tüm
+          düşünceler de kaldırılır.
         </p>
       )}
     </main>

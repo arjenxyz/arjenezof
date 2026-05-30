@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { AdminNodeForm } from "@/components/AdminNodeForm";
 import { isAuthenticated } from "@/lib/auth";
 import { getAllNodes, getNodeById } from "@/lib/nodes";
+import { getAllTopics } from "@/lib/topics";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -13,10 +14,12 @@ export default async function EditNodePage({ params }: Props) {
   if (!authed) redirect("/admin/login");
 
   const { id } = await params;
-  const node = await getNodeById(id);
+  const [node, topics, parents] = await Promise.all([
+    getNodeById(id),
+    getAllTopics(),
+    getAllNodes(),
+  ]);
   if (!node) notFound();
-
-  const parents = await getAllNodes();
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
@@ -26,7 +29,12 @@ export default async function EditNodePage({ params }: Props) {
       <h1 className="mt-3 font-serif text-2xl text-stone-900 sm:mt-4 sm:text-3xl">Düşünceyi düzenle</h1>
       <div className="mt-6 rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:mt-8 sm:p-6">
         <AdminNodeForm
-          parents={parents.map((item) => ({ id: item.id, title: item.title }))}
+          topics={topics.map((t) => ({ id: t.id, title: t.title }))}
+          parents={parents.map((item) => ({
+            id: item.id,
+            title: item.title,
+            topicId: item.topicId,
+          }))}
           initial={{
             id: node.id,
             title: node.title,
@@ -34,6 +42,7 @@ export default async function EditNodePage({ params }: Props) {
             branchQuestion: node.branchQuestion ?? "",
             branchLabel: node.branchLabel ?? "",
             parentId: node.parentId ?? "",
+            topicId: node.topicId,
             tags: node.tags,
             sortOrder: node.sortOrder,
             published: node.published,

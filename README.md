@@ -4,17 +4,20 @@ Arjen Esen'in akıl denemelerini şema ve metin olarak paylaştığı kişisel d
 
 ## Özellikler
 
-- **Şema görünümü:** Tüm düşünce ağacını interaktif haritada gör (salt okunur)
+- **Konular:** Her konunun kendi giriş metni, şeması ve düşünce ağacı
+- **Şema görünümü:** Konu bazında interaktif harita (salt okunur)
 - **Liste görünümü:** Hiyerarşik metin listesi
 - **Detay sayfaları:** Her düşüncenin tam metni, etiketleri ve alt dalları
-- **Admin paneli:** Sadece sen düşünce ekleyebilir, düzenleyebilir ve silebilirsin
+- **Admin paneli:** Konu ve düşünce ekleme, düzenleme, silme
 - **Türkçe arayüz**
 
 ## Supabase kurulumu
 
-1. [supabase.com](https://supabase.com) üzerinde proje oluştur
-2. **SQL Editor** → `prisma/supabase-setup.sql` dosyasını yapıştır → **Run**
-3. **Project Settings → API** bölümünden:
+**Sıfırdan kurulum:** SQL Editor → `prisma/supabase-setup.sql` → Run
+
+**Mevcut veritabanına konu desteği eklemek:** `supabase/topics-migration.sql` → Run
+
+**Project Settings → API** bölümünden:
    - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
    - **service_role** (gizli anahtar) → `SUPABASE_SERVICE_ROLE_KEY`
 
@@ -54,10 +57,11 @@ PostgreSQL connection string gerekmez — sadece Supabase URL + service_role key
 ## Admin kullanımı
 
 1. `/admin/login` adresinden giriş yap
-2. **Yeni düşünce** ile kök veya alt dal ekle
-3. **Sonraki soru** alanına şemada görünecek soruyu yaz
-4. **Dal etiketi** alanına üst düğümden gelen cevabı yaz (örn. Evet, Hayır)
-5. **Üst düşünce** seçerek ağaca bağla
+2. **Konular** bölümünden yeni konu ekle (başlık + açıklama metni)
+3. **Yeni düşünce** ile konuya kök veya alt dal ekle
+4. **Sonraki soru** alanına şemada görünecek soruyu yaz
+5. **Dal etiketi** alanına üst düğümden gelen cevabı yaz (örn. Evet, Hayır)
+6. **Üst düşünce** aynı konudan seçilmelidir
 
 ## Teknoloji
 
