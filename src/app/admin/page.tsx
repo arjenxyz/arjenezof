@@ -1,15 +1,18 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AdminLogoutButton } from "@/components/AdminLogoutButton";
+import { SiteErrorPanel } from "@/components/SiteErrorPanel";
 import { isAuthenticated } from "@/lib/auth";
+import { getDatabaseErrorMessage } from "@/lib/db-errors";
 import { buildTree, getAllNodes } from "@/lib/nodes";
 
 export default async function AdminDashboardPage() {
   const authed = await isAuthenticated();
   if (!authed) redirect("/admin/login");
 
-  const nodes = await getAllNodes();
-  const tree = buildTree(nodes);
+  try {
+    const nodes = await getAllNodes();
+    const tree = buildTree(nodes);
 
   return (
     <main className="mx-auto min-h-screen max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
@@ -142,4 +145,8 @@ export default async function AdminDashboardPage() {
       )}
     </main>
   );
+  } catch (error) {
+    const content = getDatabaseErrorMessage(error);
+    return <SiteErrorPanel {...content} showHomeLink={false} />;
+  }
 }

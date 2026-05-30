@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/Header";
+import { SiteErrorPanel } from "@/components/SiteErrorPanel";
+import { getDatabaseErrorMessage } from "@/lib/db-errors";
 import { formatDate, getNodeBySlug, parseTags } from "@/lib/nodes";
 
 export const dynamic = "force-dynamic";
@@ -11,21 +13,27 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const node = await getNodeBySlug(slug);
-  if (!node) return { title: "Düşünce bulunamadı" };
-  return {
-    title: node.title,
-    description: node.content.slice(0, 160),
-  };
+  try {
+    const { slug } = await params;
+    const node = await getNodeBySlug(slug);
+    if (!node) return { title: "Düşünce bulunamadı" };
+    return {
+      title: node.title,
+      description: node.content.slice(0, 160),
+    };
+  } catch {
+    return { title: "Düşünce yüklenemedi" };
+  }
 }
 
 export default async function ThoughtDetailPage({ params }: Props) {
   const { slug } = await params;
-  const node = await getNodeBySlug(slug);
-  if (!node) notFound();
 
-  const tags = parseTags(node.tags);
+  try {
+    const node = await getNodeBySlug(slug);
+    if (!node) notFound();
+
+    const tags = parseTags(node.tags);
 
   return (
     <>
@@ -104,4 +112,11 @@ export default async function ThoughtDetailPage({ params }: Props) {
       </main>
     </>
   );
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("NEXT_NOT_FOUND")) {
+      throw error;
+    }
+    const content = getDatabaseErrorMessage(error);
+    return <SiteErrorPanel {...content} />;
+  }
 }
