@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
+type TopicMode = "existing" | "new";
+
 type Props = {
   topics: { id: string; title: string }[];
   parents: { id: string; title: string; topicId: string }[];
@@ -25,15 +27,34 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [topicMode, setTopicMode] = useState<TopicMode>(
+    initial
+      ? "existing"
+      : topics.length === 0
+        ? "new"
+        : defaultTopicId
+          ? "existing"
+          : "new",
+  );
   const [topicId, setTopicId] = useState(initial?.topicId ?? defaultTopicId ?? topics[0]?.id ?? "");
+  const [newTopicTitle, setNewTopicTitle] = useState("");
+  const [newTopicDescription, setNewTopicDescription] = useState("");
   const fieldClass =
     "w-full rounded-lg border border-stone-300 px-3 py-3 text-base text-stone-900 outline-none focus:border-[#6b7f6a] sm:py-2 sm:text-sm";
   const buttonPrimaryClass =
     "rounded-lg bg-[#4a5d49] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#3d4d3c] disabled:opacity-60 touch-manipulation sm:py-2";
 
+  const activeTopicId = topicMode === "existing" ? topicId : "";
+
   const filteredParents = useMemo(
-    () => parents.filter((parent) => parent.topicId === topicId && parent.id !== initial?.id),
-    [parents, topicId, initial?.id],
+    () =>
+      parents.filter(
+        (parent) =>
+          topicMode === "existing" &&
+          parent.topicId === activeTopicId &&
+          parent.id !== initial?.id,
+      ),
+    [parents, topicMode, activeTopicId, initial?.id],
   );
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -45,13 +66,20 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
     const payload = {
       title: String(formData.get("title") ?? ""),
       content: String(formData.get("content") ?? ""),
-      topicId: String(formData.get("topicId") ?? ""),
       branchQuestion: String(formData.get("branchQuestion") ?? ""),
       branchLabel: String(formData.get("branchLabel") ?? ""),
       parentId: String(formData.get("parentId") ?? ""),
       tags: String(formData.get("tags") ?? ""),
       sortOrder: Number(formData.get("sortOrder") ?? 0),
       published: formData.get("published") === "on",
+      ...(topicMode === "new"
+        ? {
+            newTopic: {
+              title: newTopicTitle,
+              description: newTopicDescription,
+            },
+          }
+        : { topicId }),
     };
 
     const url = initial ? `/api/nodes/${initial.id}` : "/api/nodes";
@@ -92,25 +120,91 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <div>
-        <label htmlFor="topicId" className="mb-1 block text-sm font-medium text-stone-700">
-          Konu
-        </label>
-        <select
-          id="topicId"
-          name="topicId"
-          required
-          value={topicId}
-          onChange={(event) => setTopicId(event.target.value)}
-          className={fieldClass}
-        >
-          {topics.map((topic) => (
-            <option key={topic.id} value={topic.id}>
-              {topic.title}
-            </option>
-          ))}
-        </select>
-      </div>
+      <fieldset className="space-y-3 rounded-xl border border-stone-200 bg-stone-50/50 p-4">
+        <legend className="px-1 text-sm font-medium text-stone-700">Konu</legend>
+        <p className="text-xs leading-relaxed text-stone-500">
+          İstediğin herhangi bir konuyu yazabilirsin — din, kuşlar, uçmak, kahve… Önceden tanımlı
+          bir liste yok.
+        </p>
+
+        <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
+          <label className="flex min-h-[44px] cursor-pointer items-center gap-2 text-sm text-stone-700 touch-manipulation">
+            <input
+              type="radio"
+              name="topicMode"
+              checked={topicMode === "new"}
+              onChange={() => setTopicMode("new")}
+              className="h-4 w-4 border-stone-300"
+            />
+            Yeni konu yaz
+          </label>
+          {topics.length > 0 && (
+            <label className="flex min-h-[44px] cursor-pointer items-center gap-2 text-sm text-stone-700 touch-manipulation">
+              <input
+                type="radio"
+                name="topicMode"
+                checked={topicMode === "existing"}
+                onChange={() => setTopicMode("existing")}
+                className="h-4 w-4 border-stone-300"
+              />
+              Mevcut konudan seç
+            </label>
+          )}
+        </div>
+
+        {topicMode === "new" ? (
+          <div className="space-y-3">
+            <div>
+              <label htmlFor="newTopicTitle" className="mb-1 block text-sm font-medium text-stone-700">
+                Konu adı
+              </label>
+              <input
+                id="newTopicTitle"
+                required
+                value={newTopicTitle}
+                onChange={(event) => setNewTopicTitle(event.target.value)}
+                className={fieldClass}
+                placeholder="Örn: Kuşlar nasıl uçar?"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="newTopicDescription"
+                className="mb-1 block text-sm font-medium text-stone-700"
+              >
+                Konu giriş metni (opsiyonel)
+              </label>
+              <textarea
+                id="newTopicDescription"
+                rows={3}
+                value={newTopicDescription}
+                onChange={(event) => setNewTopicDescription(event.target.value)}
+                className={`${fieldClass} leading-relaxed`}
+                placeholder="Konu sayfasında görünecek kısa giriş… Boş bırakabilirsin."
+              />
+            </div>
+          </div>
+        ) : (
+          <div>
+            <label htmlFor="topicId" className="mb-1 block text-sm font-medium text-stone-700">
+              Konu seç
+            </label>
+            <select
+              id="topicId"
+              required
+              value={topicId}
+              onChange={(event) => setTopicId(event.target.value)}
+              className={fieldClass}
+            >
+              {topics.map((topic) => (
+                <option key={topic.id} value={topic.id}>
+                  {topic.title}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </fieldset>
 
       <div>
         <label htmlFor="title" className="mb-1 block text-sm font-medium text-stone-700">
@@ -122,7 +216,7 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
           required
           defaultValue={initial?.title}
           className={fieldClass}
-          placeholder="Örn: Yaratıcı nedir?"
+          placeholder="Örn: Kanat eğrisi uçuşu nasıl etkiler?"
         />
       </div>
 
@@ -137,7 +231,7 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
           rows={10}
           defaultValue={initial?.content}
           className={`${fieldClass} leading-relaxed`}
-          placeholder="Bu düşünceni buraya yaz..."
+          placeholder="Aklına geleni buraya yaz…"
         />
       </div>
 
@@ -151,7 +245,7 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
             name="branchQuestion"
             defaultValue={initial?.branchQuestion}
             className={fieldClass}
-            placeholder="Örn: Yaratıcı var mıdır?"
+            placeholder="Şemada görünecek sonraki soru"
           />
         </div>
         <div>
@@ -181,6 +275,7 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
             name="parentId"
             defaultValue={initial?.parentId ?? ""}
             className={fieldClass}
+            disabled={topicMode === "new"}
           >
             <option value="">Kök düşünce (en üst)</option>
             {filteredParents.map((parent) => (
@@ -189,6 +284,11 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
               </option>
             ))}
           </select>
+          {topicMode === "new" && (
+            <p className="mt-1 text-xs text-stone-500">
+              Yeni konuda ilk düşünce kök olur. Sonra alt dallar ekleyebilirsin.
+            </p>
+          )}
         </div>
         <div>
           <label htmlFor="sortOrder" className="mb-1 block text-sm font-medium text-stone-700">
@@ -206,14 +306,14 @@ export function AdminNodeForm({ topics, parents, defaultTopicId, initial }: Prop
 
       <div>
         <label htmlFor="tags" className="mb-1 block text-sm font-medium text-stone-700">
-          Etiketler
+          Etiketler (opsiyonel)
         </label>
         <input
           id="tags"
           name="tags"
           defaultValue={initial?.tags}
           className={fieldClass}
-          placeholder="din, doğa, felsefe"
+          placeholder="kuş, fizik, merak"
         />
         <p className="mt-1 text-xs text-stone-500">Virgülle ayır.</p>
       </div>

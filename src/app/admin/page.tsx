@@ -24,7 +24,7 @@ export default async function AdminDashboardPage() {
           </p>
           <h1 className="mt-2 font-serif text-2xl text-stone-900 sm:text-3xl">Düşünce ağacı</h1>
           <p className="mt-2 text-sm text-stone-600">
-            Konulara göre düşünceleri yönet. Her düşünce bir konuya bağlıdır.
+            İstediğin konuda düşünce yaz. Konu adını sen belirlersin.
           </p>
         </div>
         <div className="flex flex-wrap gap-2 sm:gap-3">

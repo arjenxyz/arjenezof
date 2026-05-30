@@ -22,15 +22,15 @@ export async function PUT(request: Request, { params }: Params) {
     published?: boolean;
   };
 
-  if (!body.title?.trim() || !body.description?.trim()) {
-    return NextResponse.json({ error: "Başlık ve açıklama zorunludur." }, { status: 400 });
+  if (!body.title?.trim()) {
+    return NextResponse.json({ error: "Konu başlığı zorunludur." }, { status: 400 });
   }
 
   const topic = await updateTopic(
     id,
     {
       title: body.title.trim(),
-      description: body.description.trim(),
+      description: body.description?.trim() ?? "",
       sortOrder: body.sortOrder ?? 0,
       published: body.published ?? true,
     },

@@ -6,7 +6,7 @@ import {
   getParentNode,
   updateThoughtNode,
 } from "@/lib/nodes";
-import { getTopicById } from "@/lib/topics";
+import { resolveTopicId } from "@/lib/topics";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -25,6 +25,7 @@ export async function PUT(request: Request, { params }: Params) {
     title?: string;
     content?: string;
     topicId?: string;
+    newTopic?: { title?: string; description?: string };
     branchQuestion?: string;
     branchLabel?: string;
     parentId?: string;
@@ -33,14 +34,15 @@ export async function PUT(request: Request, { params }: Params) {
     published?: boolean;
   };
 
-  if (!body.title?.trim() || !body.content?.trim() || !body.topicId?.trim()) {
-    return NextResponse.json({ error: "Konu, başlık ve metin zorunludur." }, { status: 400 });
+  if (!body.title?.trim() || !body.content?.trim()) {
+    return NextResponse.json({ error: "Başlık ve metin zorunludur." }, { status: 400 });
   }
 
-  const topic = await getTopicById(body.topicId.trim());
-  if (!topic) {
-    return NextResponse.json({ error: "Konu bulunamadı." }, { status: 400 });
-  }
+  const resolvedTopicId =
+    (await resolveTopicId({
+      topicId: body.topicId ?? existing.topicId,
+      newTopic: body.newTopic,
+    })) ?? existing.topicId;
 
   const parentId = body.parentId?.trim() || null;
   if (parentId === id) {
@@ -52,7 +54,7 @@ export async function PUT(request: Request, { params }: Params) {
     if (!parent) {
       return NextResponse.json({ error: "Üst düşünce bulunamadı." }, { status: 400 });
     }
-    if (parent.topicId !== body.topicId.trim()) {
+    if (parent.topicId !== resolvedTopicId) {
       return NextResponse.json({ error: "Üst düşünce aynı konuda olmalıdır." }, { status: 400 });
     }
   }
@@ -62,7 +64,7 @@ export async function PUT(request: Request, { params }: Params) {
     {
       title: body.title.trim(),
       content: body.content.trim(),
-      topicId: body.topicId.trim(),
+      topicId: resolvedTopicId,
       branchQuestion: body.branchQuestion?.trim() || null,
       branchLabel: body.branchLabel?.trim() || null,
       parentId,

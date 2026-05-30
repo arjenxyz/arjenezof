@@ -83,7 +83,7 @@ export function AdminTopicForm({ initial }: Props) {
           required
           defaultValue={initial?.title}
           className={fieldClass}
-          placeholder="Örn: Din & inanç"
+          placeholder="Örn: Kuşlar nasıl uçar?"
         />
       </div>
 
@@ -94,11 +94,10 @@ export function AdminTopicForm({ initial }: Props) {
         <textarea
           id="description"
           name="description"
-          required
           rows={6}
           defaultValue={initial?.description}
           className={`${fieldClass} leading-relaxed`}
-          placeholder="Bu konu hakkında ne düşünüyorsun? Ziyaretçi konu sayfasında bunu okur."
+          placeholder="Konu sayfasında görünecek kısa giriş… Boş bırakabilirsin."
         />
       </div>
 

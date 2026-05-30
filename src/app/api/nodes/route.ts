@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
 import { createThoughtNode, getParentNode } from "@/lib/nodes";
-import { getTopicById } from "@/lib/topics";
+import { resolveTopicId } from "@/lib/topics";
 
 export async function POST(request: Request) {
   if (!(await isAuthenticated())) {
@@ -12,6 +12,7 @@ export async function POST(request: Request) {
     title?: string;
     content?: string;
     topicId?: string;
+    newTopic?: { title?: string; description?: string };
     branchQuestion?: string;
     branchLabel?: string;
     parentId?: string;
@@ -20,13 +21,20 @@ export async function POST(request: Request) {
     published?: boolean;
   };
 
-  if (!body.title?.trim() || !body.content?.trim() || !body.topicId?.trim()) {
-    return NextResponse.json({ error: "Konu, başlık ve metin zorunludur." }, { status: 400 });
+  if (!body.title?.trim() || !body.content?.trim()) {
+    return NextResponse.json({ error: "Başlık ve metin zorunludur." }, { status: 400 });
   }
 
-  const topic = await getTopicById(body.topicId.trim());
-  if (!topic) {
-    return NextResponse.json({ error: "Konu bulunamadı." }, { status: 400 });
+  const resolvedTopicId = await resolveTopicId({
+    topicId: body.topicId,
+    newTopic: body.newTopic,
+  });
+
+  if (!resolvedTopicId) {
+    return NextResponse.json(
+      { error: "Konu seç veya yeni bir konu adı yaz." },
+      { status: 400 },
+    );
   }
 
   const parentId = body.parentId?.trim() || null;
@@ -36,7 +44,7 @@ export async function POST(request: Request) {
     if (!parent) {
       return NextResponse.json({ error: "Üst düşünce bulunamadı." }, { status: 400 });
     }
-    if (parent.topicId !== body.topicId.trim()) {
+    if (parent.topicId !== resolvedTopicId) {
       return NextResponse.json({ error: "Üst düşünce aynı konuda olmalıdır." }, { status: 400 });
     }
   }
@@ -44,7 +52,7 @@ export async function POST(request: Request) {
   const node = await createThoughtNode({
     title: body.title.trim(),
     content: body.content.trim(),
-    topicId: body.topicId.trim(),
+    topicId: resolvedTopicId,
     branchQuestion: body.branchQuestion?.trim() || null,
     branchLabel: body.branchLabel?.trim() || null,
     parentId,

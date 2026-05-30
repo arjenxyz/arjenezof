@@ -1,0 +1,28 @@
+---
+description: Her kod değişikliğinden sonra otomatik commit ve push
+alwaysApply: true
+---
+
+# Otomatik commit ve push
+
+Bu projede (`arjenezof`) kod veya yapılandırma değişikliği yaptıktan sonra, kullanıcı ayrıca istemeden **commit ve push yap**.
+
+## Ne zaman
+
+- Görev tamamlandığında ve anlamlı bir değişiklik varsa
+- Build veya lint doğrulandıysa (mümkünse önce doğrula)
+- Değişiklik yoksa boş commit oluşturma
+
+## Nasıl
+
+1. `git status`, `git diff`, `git log -3` ile durumu kontrol et
+2. `.env`, anahtar ve gizli dosyaları commit etme
+3. Anlamlı Türkçe veya mevcut repoya uygun commit mesajı yaz
+4. `git add` → `git commit` → `git push origin main` (veya aktif branch)
+5. Kullanıcıya commit hash ve push sonucunu kısaca bildir
+
+## Güvenlik
+
+- `git config` güncelleme, force push, hard reset yapma
+- Hook'ları atlatma (`--no-verify` vb.)
+- Push başarısız olursa hatayı bildir; sessizce geçme

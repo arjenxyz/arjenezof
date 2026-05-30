@@ -97,6 +97,43 @@ export async function getTopicById(id: string) {
   return data ? mapTopic(data as TopicRow) : null;
 }
 
+export async function findTopicByTitle(title: string) {
+  const supabase = createSupabaseAdmin();
+  const { data, error } = await supabase
+    .from(TOPIC_TABLE)
+    .select("*")
+    .eq("title", title.trim())
+    .maybeSingle();
+
+  if (error) throw error;
+  return data ? mapTopic(data as TopicRow) : null;
+}
+
+export async function resolveTopicId(input: {
+  topicId?: string;
+  newTopic?: { title?: string; description?: string };
+}) {
+  if (input.newTopic?.title?.trim()) {
+    const title = input.newTopic.title.trim();
+    const existing = await findTopicByTitle(title);
+    if (existing) return existing.id;
+
+    const created = await createTopic({
+      title,
+      description: input.newTopic.description?.trim() ?? "",
+    });
+    return created.id;
+  }
+
+  if (input.topicId?.trim()) {
+    const topic = await getTopicById(input.topicId.trim());
+    if (!topic) return null;
+    return topic.id;
+  }
+
+  return null;
+}
+
 type TopicInput = {
   title: string;
   description: string;

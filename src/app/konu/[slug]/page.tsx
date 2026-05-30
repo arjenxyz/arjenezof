@@ -58,7 +58,7 @@ export default async function TopicPage({ params }: Props) {
               {topic.title}
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-stone-600 sm:mt-4 sm:text-base">
-              {topic.description}
+              {topic.description || "Bu konu üzerine düşünceler."}
             </p>
             <p className="mt-2 text-xs text-stone-500 sm:text-sm">{total} düşünce düğümü</p>
           </section>

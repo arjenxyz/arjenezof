@@ -28,8 +28,8 @@ export default async function HomePage() {
               Konular
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-stone-600 sm:mt-4 sm:text-base">
-              Her konunun kendi giriş metni, şeması ve düşünce ağacı var. Din, doğa, varoluş
-              ve daha fazlası — sorularımı konu konu topladım.
+              Her konunun kendi şeması ve metinleri var. Konuları sen belirlersin — din, kuşlar,
+              uçmak, kahve… aklına gelen her şey.
             </p>
           </section>
 
