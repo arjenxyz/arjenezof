@@ -13,6 +13,22 @@ type Props = {
 type View = "schema" | "list";
 
 export function HomeContent({ flatNodes, tree }: Props) {
+  const hasContent = flatNodes.length > 0;
+
+  if (!hasContent) {
+    return null;
+  }
+
+  return <HomeContentWithData flatNodes={flatNodes} tree={tree} />;
+}
+
+function HomeContentWithData({
+  flatNodes,
+  tree,
+}: {
+  flatNodes: ThoughtNodeRecord[];
+  tree: ThoughtNodeWithChildren[];
+}) {
   const [view, setView] = useState<View>("list");
 
   return (
@@ -57,15 +73,11 @@ export function HomeContent({ flatNodes, tree }: Props) {
         <h3 className="mb-4 font-serif text-xl text-stone-900 sm:mb-6 sm:text-2xl">
           Liste görünümü
         </h3>
-        {tree.length === 0 ? (
-          <p className="text-stone-500">Henüz yayınlanmış düşünce yok.</p>
-        ) : (
-          <ul className="space-y-4 sm:space-y-6">
-            {tree.map((node) => (
-              <ThoughtTreeList key={node.id} node={node} />
-            ))}
-          </ul>
-        )}
+        <ul className="space-y-4 sm:space-y-6">
+          {tree.map((node) => (
+            <ThoughtTreeList key={node.id} node={node} />
+          ))}
+        </ul>
       </section>
     </>
   );

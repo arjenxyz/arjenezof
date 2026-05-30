@@ -57,10 +57,14 @@ export default async function TopicPage({ params }: Props) {
             <h2 className="mt-2 font-serif text-2xl leading-tight text-stone-900 sm:text-4xl">
               {topic.title}
             </h2>
-            <p className="mt-3 text-sm leading-relaxed text-stone-600 sm:mt-4 sm:text-base">
-              {topic.description || "Bu konu üzerine düşünceler."}
-            </p>
-            <p className="mt-2 text-xs text-stone-500 sm:text-sm">{total} düşünce düğümü</p>
+            {topic.description && (
+              <p className="mt-3 text-sm leading-relaxed text-stone-600 sm:mt-4 sm:text-base">
+                {topic.description}
+              </p>
+            )}
+            {total > 0 && (
+              <p className="mt-2 text-xs text-stone-500 sm:text-sm">{total} düşünce düğümü</p>
+            )}
           </section>
 
           <HomeContent flatNodes={flatNodes} tree={tree} />
