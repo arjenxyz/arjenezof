@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-serif), ui-serif, Georgia, serif;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+.prose-thought {
+  white-space: pre-wrap;
+  line-height: 1.75;
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 640px) {
+  .prose-thought {
+    line-height: 1.8;
+    font-size: 1rem;
+  }
+}
+
+.flow-chart-shell {
+  width: 100%;
+}
+
+.flow-chart-canvas {
+  height: min(70vh, 520px);
+  min-height: 320px;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid #e7e5e4;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+@media (min-width: 640px) {
+  .flow-chart-canvas {
+    height: 620px;
+    min-height: 480px;
+  }
+}
+
+.react-flow__node {
+  cursor: pointer;
+}
+
+.react-flow__controls {
+  box-shadow: none;
+}
+
+.react-flow__controls button {
+  background: #fff;
+  border-color: #d6d3d1;
+  width: 28px;
+  height: 28px;
+}
+
+.react-flow__controls button:hover {
+  background: #f5f5f4;
+}
+
+.flow-controls-mobile.react-flow__controls {
+  bottom: 8px;
+  right: 8px;
+}
+
+.flow-controls-mobile.react-flow__controls button {
+  width: 36px;
+  height: 36px;
+}
+
+@media (max-width: 639px) {
+  .react-flow__panel.react-flow__minimap {
+    display: none;
+  }
+}
