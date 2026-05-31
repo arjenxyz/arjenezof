@@ -11,7 +11,7 @@ type NavItem = {
 };
 
 function IconHome({ active }: { active: boolean }) {
-  const className = active ? "text-[#4a5d49]" : "text-stone-500";
+  const className = active ? "text-brand" : "text-stone-500";
   return (
     <svg viewBox="0 0 24 24" className={`h-5 w-5 ${className}`} fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
       <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z" strokeLinejoin="round" />
@@ -20,7 +20,7 @@ function IconHome({ active }: { active: boolean }) {
 }
 
 function IconSearch({ active }: { active: boolean }) {
-  const className = active ? "text-[#4a5d49]" : "text-stone-500";
+  const className = active ? "text-brand" : "text-stone-500";
   return (
     <svg viewBox="0 0 24 24" className={`h-5 w-5 ${className}`} fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
       <circle cx="11" cy="11" r="6" />
@@ -30,7 +30,7 @@ function IconSearch({ active }: { active: boolean }) {
 }
 
 function IconFamily({ active }: { active: boolean }) {
-  const className = active ? "text-[#4a5d49]" : "text-stone-500";
+  const className = active ? "text-brand" : "text-stone-500";
   return (
     <svg
       viewBox="0 0 24 24"
@@ -51,7 +51,7 @@ function IconFamily({ active }: { active: boolean }) {
 }
 
 function IconAbout({ active }: { active: boolean }) {
-  const className = active ? "text-[#4a5d49]" : "text-stone-500";
+  const className = active ? "text-brand" : "text-stone-500";
   return (
     <svg viewBox="0 0 24 24" className={`h-5 w-5 ${className}`} fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
       <circle cx="12" cy="12" r="9" />
@@ -77,7 +77,7 @@ export function MobileBottomNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-stone-200/90 bg-[#f7f5f0]/95 backdrop-blur-md sm:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-stone-200/90 bg-canvas/95 backdrop-blur-md sm:hidden"
       aria-label="Ana menü"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
@@ -89,14 +89,14 @@ export function MobileBottomNav() {
               <Link
                 href={href}
                 className={`flex min-h-[52px] flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1.5 transition touch-manipulation ${
-                  active ? "bg-[#eef2ed]/90 text-[#4a5d49]" : "text-stone-600 hover:bg-stone-100/80 hover:text-stone-900"
+                  active ? "bg-brand-muted/90 text-brand" : "text-stone-600 hover:bg-stone-100/80 hover:text-stone-900"
                 }`}
                 aria-current={active ? "page" : undefined}
               >
                 <Icon active={active} />
                 <span
                   className={`max-w-full truncate text-[10px] font-medium leading-tight sm:text-[11px] ${
-                    active ? "text-[#4a5d49]" : "text-stone-600"
+                    active ? "text-brand" : "text-stone-600"
                   }`}
                 >
                   {label}

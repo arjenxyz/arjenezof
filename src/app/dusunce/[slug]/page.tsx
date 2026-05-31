@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CopyLinkButton } from "@/components/CopyLinkButton";
+import { ArticleBody } from "@/components/ArticleBody";
 import { Header } from "@/components/Header";
 import { RelatedWritingsSection } from "@/components/RelatedWritingsSection";
 import { SiteErrorPanel } from "@/components/SiteErrorPanel";
@@ -65,10 +66,17 @@ export default async function WritingDetailPage({ params }: Props) {
         <main className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
           <nav className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-stone-500">
             <Link href="/" className="transition hover:text-stone-800 touch-manipulation">
-              Konular
+              Ana sayfa
             </Link>
             {topic && (
               <>
+                <span aria-hidden="true">/</span>
+                <Link
+                  href="/#konular"
+                  className="transition hover:text-stone-800 touch-manipulation"
+                >
+                  Konular
+                </Link>
                 <span aria-hidden="true">/</span>
                 <Link
                   href={`/konu/${topic.slug}`}
@@ -85,7 +93,7 @@ export default async function WritingDetailPage({ params }: Props) {
               Bu metin{" "}
               <Link
                 href={`/dusunce/${node.continuesFrom.slug}`}
-                className="font-medium text-[#4a5d49] hover:underline"
+                className="font-medium text-brand hover:underline"
               >
                 {node.continuesFrom.title}
               </Link>{" "}
@@ -107,7 +115,7 @@ export default async function WritingDetailPage({ params }: Props) {
                 <Link
                   key={tag}
                   href={`/etiket/${encodeURIComponent(tag)}`}
-                  className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs text-stone-600 transition hover:bg-[#eef2ed] hover:text-[#4a5d49]"
+                  className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs text-stone-600 transition hover:bg-brand-muted hover:text-brand"
                 >
                   {tag}
                 </Link>
@@ -115,9 +123,7 @@ export default async function WritingDetailPage({ params }: Props) {
             </div>
           )}
 
-          <article className="prose-thought mt-6 rounded-xl border border-stone-200 bg-white p-4 text-stone-700 shadow-sm sm:mt-8 sm:p-6">
-            {node.content}
-          </article>
+          <ArticleBody content={node.content} className="mt-6 sm:mt-8" />
 
           {node.continuations.length > 0 && (
             <RelatedWritingsSection title="Devamı" writings={node.continuations} />

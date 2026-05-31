@@ -53,7 +53,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr" className={`${serif.variable} ${sans.variable} h-full`}>
-      <body className="min-h-full bg-[#f7f5f0] font-sans text-stone-800 antialiased">
+      <body className="min-h-full bg-canvas font-sans text-stone-800 antialiased">
         {children}
         <SiteLayoutExtras />
       </body>

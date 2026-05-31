@@ -3,6 +3,16 @@
 @theme inline {
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-serif), ui-serif, Georgia, serif;
+
+  --color-brand: #4a5d49;
+  --color-brand-hover: #3d4d3c;
+  --color-brand-muted: #eef2ed;
+  --color-brand-accent: #8fa38e;
+  --color-canvas: #f7f5f0;
+  --color-surface: #ffffff;
+
+  --shadow-card: 0 1px 2px rgb(28 25 23 / 0.04);
+  --shadow-card-hover: 0 4px 14px rgb(28 25 23 / 0.08);
 }
 
 html {
@@ -17,7 +27,6 @@ body {
   padding-right: env(safe-area-inset-right, 0px);
 }
 
-/* iOS: odakta yakınlaştırmayı önlemek için min 16px */
 @media (max-width: 639px) {
   input,
   select,
@@ -34,16 +43,35 @@ body {
   @apply min-h-[44px] min-w-[44px] touch-manipulation;
 }
 
+.tag-pill {
+  @apply rounded-full bg-stone-100 px-3 py-1.5 text-sm text-stone-700 transition touch-manipulation hover:bg-brand-muted hover:text-brand;
+}
+
 .prose-thought {
-  white-space: pre-wrap;
-  line-height: 1.75;
-  font-size: 0.9375rem;
+  @apply max-w-[65ch] whitespace-pre-wrap text-stone-700 bg-white border border-stone-200 rounded-2xl shadow-sm;
+  line-height: 1.8;
+  font-size: 1.0625rem;
   overflow-wrap: anywhere;
+  padding: 1.25rem 1.5rem;
 }
 
 @media (min-width: 640px) {
   .prose-thought {
-    line-height: 1.8;
-    font-size: 1rem;
+    padding: 1.75rem 2rem;
+    font-size: 1.125rem;
+    line-height: 1.85;
+  }
+}
+
+.prose-thought-code {
+  @apply bg-stone-50;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+}
+
+@media (min-width: 640px) {
+  .prose-thought-code {
+    font-size: 0.875rem;
   }
 }

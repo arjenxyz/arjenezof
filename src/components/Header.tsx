@@ -10,7 +10,7 @@ export function Header() {
 
   return (
     <header
-      className="sticky top-0 z-40 border-b border-stone-200/80 bg-[#f7f5f0]/95 backdrop-blur-sm"
+      className="sticky top-0 z-40 border-b border-stone-200/80 bg-canvas/95 backdrop-blur-sm"
       style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-5">
@@ -18,7 +18,7 @@ export function Header() {
           <p className="font-serif text-xs uppercase tracking-[0.2em] text-stone-600 sm:text-sm sm:tracking-[0.22em]">
             Arjen
           </p>
-          <h1 className="truncate font-serif text-lg text-stone-900 transition group-hover:text-[#4a5d49] sm:text-2xl">
+          <h1 className="truncate font-serif text-lg text-stone-900 transition group-hover:text-brand sm:text-2xl">
             Bu düşüncelerde ne?
           </h1>
         </Link>

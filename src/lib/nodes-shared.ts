@@ -74,16 +74,24 @@ export function writingPreviewText(content: string): string {
   const normalized = content.trim().replace(/\s+/g, " ");
   if (!normalized) return "";
 
-  const head = normalized.slice(0, 160);
-  const looksLikeCode =
-    /^(--|\/\*|CREATE\s|INSERT\s|ALTER\s|SELECT\s|UPDATE\s|DELETE\s|DROP\s)/i.test(head) ||
-    (head.includes("CREATE TABLE") && head.includes("CONSTRAINT"));
-
-  if (looksLikeCode) {
+  if (isCodeLikeContent(normalized)) {
     return "Bu metin kod veya teknik not içeriyor. Tamamını okumak için kartı aç.";
   }
 
   return normalized;
+}
+
+export function isCodeLikeContent(content: string): boolean {
+  const head = content.trim().slice(0, 160);
+  return (
+    /^(--|\/\*|CREATE\s|INSERT\s|ALTER\s|SELECT\s|UPDATE\s|DELETE\s|DROP\s)/i.test(head) ||
+    (head.includes("CREATE TABLE") && head.includes("CONSTRAINT"))
+  );
+}
+
+export function pickHomeFeaturedWritings<T extends { content: string }>(writings: T[], limit = 5) {
+  const readable = writings.filter((writing) => !isCodeLikeContent(writing.content));
+  return (readable.length > 0 ? readable : writings).slice(0, limit);
 }
 
 export function countNodes(nodes: ThoughtNodeWithChildren[]): number {

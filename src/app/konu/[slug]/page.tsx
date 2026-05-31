@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/Header";
+import { SiteFooter } from "@/components/SiteFooter";
 import { TopicWritings } from "@/components/TopicWritings";
 import { SiteErrorPanel } from "@/components/SiteErrorPanel";
 import { getDatabaseErrorMessage } from "@/lib/db-errors";
@@ -43,7 +44,7 @@ export default async function TopicPage({ params }: Props) {
         <Header />
         <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
           <Link
-            href="/"
+            href="/#konular"
             className="inline-flex min-h-[44px] items-center text-sm text-stone-500 transition hover:text-stone-800 touch-manipulation"
           >
             ← Konulara dön
@@ -71,15 +72,13 @@ export default async function TopicPage({ params }: Props) {
           {writings.length === 0 && (
             <div className="rounded-xl border border-dashed border-stone-300 bg-white p-6 text-center text-sm text-stone-600">
               <p>Bu konuda henüz metin yok.</p>
-              <Link href="/" className="mt-3 inline-block text-[#4a5d49] hover:underline">
+              <Link href="/#konular" className="mt-3 inline-block text-brand hover:underline">
                 Diğer konulara göz at →
               </Link>
             </div>
           )}
         </main>
-        <footer className="border-t border-stone-200/80 px-4 py-6 text-center text-xs text-stone-500 sm:py-8 sm:text-sm">
-          © {new Date().getFullYear()} Arjen — Bu düşüncelerde ne?
-        </footer>
+        <SiteFooter />
       </>
     );
   } catch (error) {

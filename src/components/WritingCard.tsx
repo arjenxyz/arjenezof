@@ -19,12 +19,12 @@ export function WritingCard({ writing, topicTitle, continuesFromTitle }: Props) 
   const preview = writingPreviewText(writing.content);
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-stone-200 border-l-[3px] border-l-[#8fa38e] bg-white shadow-sm transition hover:border-[#8fa38e] hover:shadow-md">
+    <article className="group overflow-hidden rounded-2xl border border-stone-200 border-l-[3px] border-l-brand-accent bg-white shadow-sm transition hover:border-brand-accent hover:shadow-md">
       <Link href={`/dusunce/${writing.slug}`} className="block touch-manipulation">
         <div className="p-4 sm:p-5">
           <div className="flex flex-wrap items-center gap-2">
             {continuesFromTitle && (
-              <span className="inline-flex rounded-full bg-[#eef2ed] px-2.5 py-0.5 text-[11px] font-medium text-[#4a5d49] ring-1 ring-inset ring-[#c5d4c4]">
+              <span className="inline-flex rounded-full bg-brand-muted px-2.5 py-0.5 text-[11px] font-medium text-brand ring-1 ring-inset ring-brand-accent/40">
                 {continuesFromTitle} · devam
               </span>
             )}
@@ -36,7 +36,7 @@ export function WritingCard({ writing, topicTitle, continuesFromTitle }: Props) 
             <span className="ml-auto text-[11px] text-stone-400">~{readingMinutes} dk</span>
           </div>
 
-          <h3 className="mt-3 font-serif text-lg leading-snug text-stone-900 transition group-hover:text-[#4a5d49] sm:text-xl">
+          <h3 className="mt-3 font-serif text-lg leading-snug text-stone-900 transition group-hover:text-brand sm:text-xl">
             {writing.title}
           </h3>
 
@@ -60,7 +60,7 @@ export function WritingCard({ writing, topicTitle, continuesFromTitle }: Props) 
 
         <div className="flex items-center justify-between gap-3 border-t border-stone-100 bg-stone-50/80 px-4 py-3 sm:px-5">
           <p className="text-xs text-stone-500">{formatDate(writing.updatedAt)}</p>
-          <span className="shrink-0 text-sm font-medium text-[#4a5d49] opacity-90 transition group-hover:opacity-100">
+          <span className="shrink-0 text-sm font-medium text-brand opacity-90 transition group-hover:opacity-100">
             Oku →
           </span>
         </div>
