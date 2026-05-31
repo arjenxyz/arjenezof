@@ -21,7 +21,7 @@ export const FAMILY_GREETINGS: Record<FamilyRole, string> = {
 
 export const FAMILY_INTRO: Record<FamilyRole, string> = {
   wife: "Arjen'in sana ve aileye yazdığı metinler burada. İstersen çocuklar ve torunlar için de yazabilirsin.",
-  children: "Babaannene ve kardeşlerine yazılan metinler burada.",
+  children: "Sana ve kardeşlerine yazılan metinler burada.",
   grandchildren: "Büyükannene ve büyükbabandan sana yazılan metinler burada.",
 };
 
@@ -50,10 +50,6 @@ export const FAMILY_SECTIONS: Record<FamilyRole, Partial<Record<FamilyAudience, 
       title: "Size",
       subtitle: "Kardeşlerinle birlikte okuyabileceğin yazılar.",
     },
-    grandchildren: {
-      title: "Torunlara",
-      subtitle: "Torunların okuduğu yazılar — sen de görebilirsin.",
-    },
   },
   grandchildren: {},
 };
@@ -66,14 +62,14 @@ export const FAMILY_DETAIL_CONTEXT: Record<FamilyAudience, string> = {
 
 export function sectionsForRole(role: FamilyRole): FamilyAudience[] {
   if (role === "wife") return FAMILY_AUDIENCES;
-  if (role === "children") return ["children", "grandchildren"];
+  if (role === "children") return ["children"];
   return ["grandchildren"];
 }
 
 export const FAMILY_ADMIN_HINTS: Record<FamilyAudience, string> = {
   wife: "Yalnızca eşin görür.",
   children: "Eş ve tüm çocuklar görür; torunlar görmez.",
-  grandchildren: "Eş, çocuklar ve torunlar görür.",
+  grandchildren: "Eş ve torunlar görür; çocuklar görmez.",
 };
 
 export const WIFE_WRITE_HINTS: Record<WifeWriteAudience, string> = {
@@ -87,9 +83,7 @@ export function wifeCanManageAudience(audience: FamilyAudience): audience is Wif
 
 export function canViewFamilyMessage(viewerRole: FamilyRole, audience: FamilyAudience) {
   if (viewerRole === "wife") return true;
-  if (viewerRole === "children") {
-    return audience === "children" || audience === "grandchildren";
-  }
+  if (viewerRole === "children") return audience === "children";
   return audience === "grandchildren";
 }
 

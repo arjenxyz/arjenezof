@@ -6,7 +6,7 @@ export function FamilyLogoutButton() {
   const router = useRouter();
 
   async function handleLogout() {
-    await fetch("/api/family/auth/logout", { method: "POST" });
+    await fetch("/api/family/auth/logout", { method: "POST", credentials: "same-origin" });
     router.push("/aile");
     router.refresh();
   }
@@ -15,7 +15,7 @@ export function FamilyLogoutButton() {
     <button
       type="button"
       onClick={handleLogout}
-      className="rounded-lg border border-stone-300 px-4 py-2.5 text-sm text-stone-700 transition hover:bg-stone-50 touch-manipulation"
+      className="text-sm text-stone-500 transition hover:text-stone-800 touch-manipulation"
     >
       Çıkış
     </button>

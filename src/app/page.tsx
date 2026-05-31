@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { SiteErrorPanel } from "@/components/SiteErrorPanel";
+import { SiteFooter } from "@/components/SiteFooter";
 import { TopicCard } from "@/components/TopicCard";
 import { WritingCard } from "@/components/WritingCard";
 import { collectTagsFromWritings } from "@/lib/discovery";
@@ -108,9 +109,7 @@ export default async function HomePage() {
             </ul>
           )}
         </main>
-        <footer className="border-t border-stone-200/80 px-4 py-6 text-center text-xs text-stone-500 sm:py-8 sm:text-sm">
-          © {new Date().getFullYear()} Arjen — Bu düşüncelerde ne?
-        </footer>
+        <SiteFooter />
       </>
     );
   } catch (error) {
