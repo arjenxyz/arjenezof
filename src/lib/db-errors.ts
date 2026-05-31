@@ -4,8 +4,61 @@ export type SiteErrorContent = {
   hint?: string;
 };
 
+type SupabaseLikeError = {
+  message?: string;
+  details?: string;
+  hint?: string;
+  code?: string;
+};
+
+function normalizeErrorText(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message.toLowerCase();
+  }
+
+  if (error && typeof error === "object") {
+    const row = error as SupabaseLikeError;
+    const parts = [row.message, row.details, row.hint, row.code].filter(
+      (part): part is string => typeof part === "string" && part.trim().length > 0,
+    );
+    if (parts.length > 0) {
+      return parts.join(" ").toLowerCase();
+    }
+  }
+
+  const fallback = String(error).toLowerCase();
+  if (fallback === "[object object]") {
+    return "";
+  }
+  return fallback;
+}
+
+function getTechnicalHint(error: unknown): string | undefined {
+  if (error instanceof Error && error.message.trim()) {
+    return error.message.trim();
+  }
+
+  if (error && typeof error === "object") {
+    const row = error as SupabaseLikeError;
+    const parts = [row.message, row.details, row.code].filter(
+      (part): part is string => typeof part === "string" && part.trim().length > 0,
+    );
+    if (parts.length > 0) {
+      return parts.join(" — ");
+    }
+  }
+
+  const fallback = String(error).trim();
+  if (fallback && fallback !== "[object Object]") {
+    return fallback;
+  }
+
+  return undefined;
+}
+
 export function getDatabaseErrorMessage(error: unknown): SiteErrorContent {
-  const msg = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+  const msg = normalizeErrorText(error);
+  const technical = getTechnicalHint(error);
 
   if (
     msg.includes("supabase yapılandırması eksik") ||
@@ -16,7 +69,7 @@ export function getDatabaseErrorMessage(error: unknown): SiteErrorContent {
       title: "Supabase yapılandırması eksik",
       message:
         "Site Supabase'e bağlanamıyor. NEXT_PUBLIC_SUPABASE_URL ve SUPABASE_SERVICE_ROLE_KEY ortam değişkenleri tanımlanmalıdır.",
-      hint: "Vercel: Settings → Environment Variables. URL: https://....supabase.co — Anahtar: Project Settings → API → service_role (gizli).",
+      hint: "Yanlış anahtar: publishable veya anon key işe yaramaz — Project Settings → API → service_role (secret) gerekir. Vercel'de de aynı iki değişkeni güncelle ve yeniden deploy et.",
     };
   }
 
@@ -25,12 +78,19 @@ export function getDatabaseErrorMessage(error: unknown): SiteErrorContent {
     msg.includes("econnrefused") ||
     msg.includes("timeout") ||
     msg.includes("fetch failed") ||
-    msg.includes("invalid api key")
+    msg.includes("invalid api key") ||
+    msg.includes("invalid jwt") ||
+    msg.includes("jwt") ||
+    msg.includes("unauthorized") ||
+    msg.includes("401")
   ) {
     return {
       title: "Supabase'e bağlanılamadı",
-      message: "Supabase'e şu an ulaşılamıyor. URL ve service_role anahtarını kontrol et.",
-      hint: "Project Settings → API bölümünden URL ve service_role key'i kopyala.",
+      message:
+        "Supabase anahtarı veya URL geçersiz görünüyor. Anahtarı döndürdüysen Vercel ortam değişkenlerini de güncelle.",
+      hint: technical
+        ? `Teknik: ${technical}`
+        : "Project Settings → API → Project URL + service_role secret. Publishable/anon key kullanma.",
     };
   }
 
@@ -55,6 +115,8 @@ export function getDatabaseErrorMessage(error: unknown): SiteErrorContent {
   return {
     title: "Sayfa yüklenemedi",
     message: "Bir sorun oluştu ve sayfa şu an gösterilemiyor. Lütfen biraz sonra tekrar dene.",
-    hint: "Sorun devam ederse sayfayı yenile veya ana sayfaya dön.",
+    hint: technical
+      ? `Teknik: ${technical}`
+      : "Sorun devam ederse sayfayı yenile veya ana sayfaya dön.",
   };
 }
