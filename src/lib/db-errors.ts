@@ -63,13 +63,23 @@ export function getDatabaseErrorMessage(error: unknown): SiteErrorContent {
   if (
     msg.includes("supabase yapılandırması eksik") ||
     msg.includes("next_public_supabase_url") ||
-    msg.includes("supabase_service_role_key")
+    msg.includes("supabase_service_role_key") ||
+    msg.includes("supabase_secret_key")
   ) {
     return {
       title: "Supabase yapılandırması eksik",
       message:
-        "Site Supabase'e bağlanamıyor. NEXT_PUBLIC_SUPABASE_URL ve SUPABASE_SERVICE_ROLE_KEY ortam değişkenleri tanımlanmalıdır.",
-      hint: "Yanlış anahtar: publishable veya anon key işe yaramaz — Project Settings → API → service_role (secret) gerekir. Vercel'de de aynı iki değişkeni güncelle ve yeniden deploy et.",
+        "Site Supabase'e bağlanamıyor. NEXT_PUBLIC_SUPABASE_URL ve sunucu anahtarı (SUPABASE_SECRET_KEY) tanımlanmalıdır.",
+      hint: "Publishable key (sb_publishable_...) yalnızca tarayıcı içindir. Sunucu için Supabase → Settings → API Keys → Secret key (sb_secret_...) kullan.",
+    };
+  }
+
+  if (msg.includes("legacy api keys are disabled")) {
+    return {
+      title: "Eski Supabase anahtarları kapatılmış",
+      message:
+        "Projende legacy JWT anahtarları (eyJ... service_role) devre dışı. Yeni secret key (sb_secret_...) kullanmalısın.",
+      hint: "Supabase → Settings → API Keys → Secret keys bölümünden sb_secret_... anahtarını kopyala; SUPABASE_SECRET_KEY olarak .env ve Vercel'e ekle, sonra redeploy et.",
     };
   }
 
@@ -90,7 +100,7 @@ export function getDatabaseErrorMessage(error: unknown): SiteErrorContent {
         "Supabase anahtarı veya URL geçersiz görünüyor. Anahtarı döndürdüysen Vercel ortam değişkenlerini de güncelle.",
       hint: technical
         ? `Teknik: ${technical}`
-        : "Project Settings → API → Project URL + service_role secret. Publishable/anon key kullanma.",
+        : "Project Settings → API Keys → Project URL + Secret key (sb_secret_...). Publishable key sunucuda kullanılmaz.",
     };
   }
 
