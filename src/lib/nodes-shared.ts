@@ -69,6 +69,23 @@ export function estimateReadingMinutes(content: string) {
   return Math.max(1, Math.ceil(words / 200));
 }
 
+/** Kart önizlemesi — kod/SQL gibi okunaksız içerikleri kısaltır. */
+export function writingPreviewText(content: string): string {
+  const normalized = content.trim().replace(/\s+/g, " ");
+  if (!normalized) return "";
+
+  const head = normalized.slice(0, 160);
+  const looksLikeCode =
+    /^(--|\/\*|CREATE\s|INSERT\s|ALTER\s|SELECT\s|UPDATE\s|DELETE\s|DROP\s)/i.test(head) ||
+    (head.includes("CREATE TABLE") && head.includes("CONSTRAINT"));
+
+  if (looksLikeCode) {
+    return "Bu metin kod veya teknik not içeriyor. Tamamını okumak için kartı aç.";
+  }
+
+  return normalized;
+}
+
 export function countNodes(nodes: ThoughtNodeWithChildren[]): number {
   return nodes.reduce((sum, node) => sum + 1 + countNodes(node.children), 0);
 }

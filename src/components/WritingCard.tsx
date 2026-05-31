@@ -1,6 +1,11 @@
 import Link from "next/link";
 import type { ThoughtNodeRecord } from "@/lib/nodes-shared";
-import { estimateReadingMinutes, formatDate, parseTags } from "@/lib/nodes-shared";
+import {
+  estimateReadingMinutes,
+  formatDate,
+  parseTags,
+  writingPreviewText,
+} from "@/lib/nodes-shared";
 
 type Props = {
   writing: ThoughtNodeRecord;
@@ -11,34 +16,55 @@ type Props = {
 export function WritingCard({ writing, topicTitle, continuesFromTitle }: Props) {
   const tags = parseTags(writing.tags);
   const readingMinutes = estimateReadingMinutes(writing.content);
+  const preview = writingPreviewText(writing.content);
 
   return (
-    <article className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition hover:border-[#8fa38e] hover:shadow-md sm:p-5">
-      {continuesFromTitle && (
-        <p className="mb-2 text-xs font-medium text-[#4a5d49]">
-          {continuesFromTitle} metninin devamı
-        </p>
-      )}
-      <Link href={`/dusunce/${writing.slug}`} className="group block touch-manipulation">
-        <h3 className="font-serif text-lg leading-snug text-stone-900 group-hover:text-[#4a5d49] sm:text-xl">
-          {writing.title}
-        </h3>
-        <p className="mt-2 line-clamp-4 text-sm leading-relaxed text-stone-600">{writing.content}</p>
+    <article className="group overflow-hidden rounded-2xl border border-stone-200 border-l-[3px] border-l-[#8fa38e] bg-white shadow-sm transition hover:border-[#8fa38e] hover:shadow-md">
+      <Link href={`/dusunce/${writing.slug}`} className="block touch-manipulation">
+        <div className="p-4 sm:p-5">
+          <div className="flex flex-wrap items-center gap-2">
+            {continuesFromTitle && (
+              <span className="inline-flex rounded-full bg-[#eef2ed] px-2.5 py-0.5 text-[11px] font-medium text-[#4a5d49] ring-1 ring-inset ring-[#c5d4c4]">
+                {continuesFromTitle} · devam
+              </span>
+            )}
+            {topicTitle && (
+              <span className="inline-flex rounded-full bg-stone-100 px-2.5 py-0.5 text-[11px] font-medium text-stone-700 ring-1 ring-inset ring-stone-200">
+                {topicTitle}
+              </span>
+            )}
+            <span className="ml-auto text-[11px] text-stone-400">~{readingMinutes} dk</span>
+          </div>
+
+          <h3 className="mt-3 font-serif text-lg leading-snug text-stone-900 transition group-hover:text-[#4a5d49] sm:text-xl">
+            {writing.title}
+          </h3>
+
+          {preview && (
+            <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-stone-600">{preview}</p>
+          )}
+
+          {tags.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {tags.slice(0, 4).map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-stone-50 px-2 py-0.5 text-[11px] text-stone-500 ring-1 ring-stone-100"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between gap-3 border-t border-stone-100 bg-stone-50/80 px-4 py-3 sm:px-5">
+          <p className="text-xs text-stone-500">{formatDate(writing.updatedAt)}</p>
+          <span className="shrink-0 text-sm font-medium text-[#4a5d49] opacity-90 transition group-hover:opacity-100">
+            Oku →
+          </span>
+        </div>
       </Link>
-      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-stone-500">
-        {topicTitle && <span className="text-stone-600">{topicTitle}</span>}
-        <span>{formatDate(writing.updatedAt)}</span>
-        <span>· ~{readingMinutes} dk</span>
-        {tags.map((tag) => (
-          <Link
-            key={tag}
-            href={`/etiket/${encodeURIComponent(tag)}`}
-            className="inline-flex min-h-[32px] items-center rounded-full bg-stone-100 px-2.5 py-1 text-stone-600 transition hover:bg-[#eef2ed] hover:text-[#4a5d49] touch-manipulation"
-          >
-            {tag}
-          </Link>
-        ))}
-      </div>
     </article>
   );
 }

@@ -57,9 +57,17 @@ export default async function HomePage() {
           </section>
 
           {recentWritings.length > 0 && (
-            <section className="mb-10">
-              <h3 className="mb-4 font-serif text-xl text-stone-900 sm:text-2xl">Son yazılar</h3>
-              <ul className="space-y-4 sm:space-y-5">
+            <section className="mb-12">
+              <div className="mb-5 flex flex-wrap items-end justify-between gap-3 border-b border-stone-200 pb-4">
+                <div>
+                  <h3 className="font-serif text-xl text-stone-900 sm:text-2xl">Son yazılar</h3>
+                  <p className="mt-1 text-sm text-stone-500">En son eklenen metinler</p>
+                </div>
+                <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
+                  {recentWritings.length} yazı
+                </span>
+              </div>
+              <ul className="space-y-4">
                 {recentWritings.map((writing) => (
                   <li key={writing.id}>
                     <WritingCard
@@ -76,10 +84,11 @@ export default async function HomePage() {
           )}
 
           {interestTags.length > 0 && (
-            <section className="mb-8">
-              <p className="mb-3 text-xs uppercase tracking-[0.15em] text-stone-500">
-                İlgi alanlarına göre keşfet
-              </p>
+            <section className="mb-10">
+              <div className="mb-4 border-b border-stone-200 pb-4">
+                <h3 className="font-serif text-xl text-stone-900 sm:text-2xl">Etiketler</h3>
+                <p className="mt-1 text-sm text-stone-500">İlgi alanına göre keşfet</p>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {interestTags.map((tag) => (
                   <Link
@@ -97,13 +106,24 @@ export default async function HomePage() {
           {topicsWithCounts.length === 0 ? (
             <p className="text-stone-500">Henüz yayınlanmış konu yok.</p>
           ) : (
-            <ul className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-              {topicsWithCounts.map(({ topic, nodeCount }) => (
-                <li key={topic.id}>
-                  <TopicCard topic={topic} nodeCount={nodeCount} />
-                </li>
-              ))}
-            </ul>
+            <section>
+              <div className="mb-5 flex flex-wrap items-end justify-between gap-3 border-b border-stone-200 pb-4">
+                <div>
+                  <h3 className="font-serif text-xl text-stone-900 sm:text-2xl">Konular</h3>
+                  <p className="mt-1 text-sm text-stone-500">Konuya göre metinlere göz at</p>
+                </div>
+                <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
+                  {topicsWithCounts.length} konu
+                </span>
+              </div>
+              <ul className="grid gap-4 sm:grid-cols-2 sm:gap-5">
+                {topicsWithCounts.map(({ topic, nodeCount }) => (
+                  <li key={topic.id} className="flex">
+                    <TopicCard topic={topic} nodeCount={nodeCount} />
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
         </main>
         <SiteFooter />
