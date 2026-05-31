@@ -1,4 +1,5 @@
 import { Header } from "@/components/Header";
+import { SiteIntroText } from "@/components/SiteIntroText";
 import { RandomQuote } from "@/components/RandomQuote";
 import { SiteErrorPanel } from "@/components/SiteErrorPanel";
 import { getDatabaseErrorMessage } from "@/lib/db-errors";
@@ -19,18 +20,7 @@ export default async function AboutPage() {
         <Header />
         <main className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
           <h1 className="font-serif text-2xl text-stone-900 sm:text-4xl">Hakkında</h1>
-          <div className="mt-5 space-y-4 text-sm leading-relaxed text-stone-700 sm:mt-6 sm:text-base">
-            <p>
-              <strong>Bu düşüncelerde ne?</strong>, Arjen&apos;in kendi kendine sorduğu
-              soruların ve akıl denemelerinin paylaşıldığı kişisel bir yazı alanıdır. Buradaki
-              metinler kesin hükümler değildir; zamanla değişebilir, yanlış olabilir, eksik
-              kalabilir.
-            </p>
-            <p>
-              Konulara, etiketlere ve metinler arası bağlantılara göre gezinebilirsin. Bir metnin
-              devamını okuyabilir veya ilgi alanına göre benzer yazılara geçebilirsin.
-            </p>
-          </div>
+          <SiteIntroText className="mt-5 sm:mt-6" />
 
           <RandomQuote
             quotes={quotes.map((quote) => ({
