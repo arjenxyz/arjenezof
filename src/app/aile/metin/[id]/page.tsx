@@ -1,12 +1,12 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { FamilyAudienceBadge } from "@/components/FamilyAudienceBadge";
-import { FamilyLogoutButton } from "@/components/FamilyLogoutButton";
+import { FamilyDetailHeader, FamilyShell } from "@/components/FamilyShell";
 import { SiteErrorPanel } from "@/components/SiteErrorPanel";
 import { formatDate } from "@/lib/nodes-shared";
 import { getDatabaseErrorMessage } from "@/lib/db-errors";
 import { getFamilyMessageForRole } from "@/lib/family";
 import { getFamilySessionRole } from "@/lib/family-auth";
+import { FAMILY_DETAIL_CONTEXT } from "@/lib/family-shared";
 
 export const dynamic = "force-dynamic";
 
@@ -31,28 +31,29 @@ export default async function FamilyMessageDetailPage({ params }: Props) {
     const message = await getFamilyMessageForRole(id, role);
     if (!message) notFound();
 
+    const showContext = role === "wife" && message.audience !== "wife";
+
     return (
-      <main className="mx-auto min-h-screen max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
-        <div className="flex items-start justify-between gap-4">
-          <Link
-            href="/aile/metinler"
-            className="text-sm text-stone-500 hover:text-stone-800 touch-manipulation"
-          >
-            ← Listeye dön
-          </Link>
-          <FamilyLogoutButton />
-        </div>
+      <FamilyShell role={role}>
+        <FamilyDetailHeader role={role} />
 
-        <div className="mt-6">
-          <FamilyAudienceBadge audience={message.audience} />
-          <h1 className="mt-3 font-serif text-2xl text-stone-900 sm:text-4xl">{message.title}</h1>
+        <article className="mt-6 sm:mt-8">
+          {showContext ? (
+            <p className="text-sm text-stone-500">{FAMILY_DETAIL_CONTEXT[message.audience]}</p>
+          ) : role !== "wife" ? (
+            <FamilyAudienceBadge audience={message.audience} />
+          ) : null}
+
+          <h1 className="mt-3 font-serif text-2xl leading-tight text-stone-900 sm:text-4xl">
+            {message.title}
+          </h1>
           <p className="mt-3 text-sm text-stone-500">{formatDate(message.updatedAt)}</p>
-        </div>
 
-        <article className="prose-thought mt-6 rounded-xl border border-stone-200 bg-white p-4 text-stone-700 shadow-sm sm:mt-8 sm:p-6">
-          {message.content}
+          <div className="prose-thought mt-6 rounded-xl border border-stone-200 bg-white p-4 text-base leading-relaxed text-stone-700 shadow-sm sm:mt-8 sm:p-6 sm:text-lg">
+            {message.content}
+          </div>
         </article>
-      </main>
+      </FamilyShell>
     );
   } catch (error) {
     if (error instanceof Error && error.message.includes("NEXT_NOT_FOUND")) {
