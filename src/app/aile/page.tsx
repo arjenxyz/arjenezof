@@ -13,7 +13,7 @@ export default async function FamilyLoginPage() {
   const role = await getFamilySessionRole();
   if (role) {
     return (
-      <FamilyShell role={role} hideIntro>
+      <FamilyShell role={role} variant="home">
         <FamilyWelcome role={role} />
       </FamilyShell>
     );

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { familyMenuItemsForRole, type FamilyMenuItem, type FamilyRole } from "@/lib/family-shared";
 
@@ -23,10 +23,12 @@ function MenuLink({
   item,
   pathname,
   nested,
+  onNavigate,
 }: {
   item: FamilyMenuItem;
   pathname: string;
   nested?: boolean;
+  onNavigate?: () => void;
 }) {
   if (!item.href) return null;
 
@@ -35,6 +37,7 @@ function MenuLink({
   return (
     <Link
       href={item.href}
+      onClick={onNavigate}
       className={`block rounded-xl transition touch-manipulation ${
         nested ? "px-3 py-2.5" : "px-4 py-3"
       } ${
@@ -51,7 +54,9 @@ function MenuLink({
 
 export function FamilyDrawerMenu({ role }: Props) {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const items = familyMenuItemsForRole(role);
 
   useEffect(() => {
@@ -73,18 +78,27 @@ export function FamilyDrawerMenu({ role }: Props) {
     };
   }, [open]);
 
+  async function handleLogout() {
+    setLoggingOut(true);
+    await fetch("/api/family/auth/logout", { method: "POST", credentials: "same-origin" });
+    setOpen(false);
+    router.push("/aile");
+    router.refresh();
+  }
+
   return (
     <>
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-700 shadow-sm transition hover:bg-stone-50 touch-manipulation"
+        className="inline-flex h-11 items-center gap-2 rounded-xl border border-stone-200 bg-white px-3.5 text-stone-700 shadow-sm transition hover:bg-stone-50 touch-manipulation sm:px-4"
         aria-label="Menüyü aç"
         aria-expanded={open}
       >
         <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
         </svg>
+        <span className="hidden text-sm font-medium sm:inline">Menü</span>
       </button>
 
       {open && (
@@ -96,7 +110,7 @@ export function FamilyDrawerMenu({ role }: Props) {
             onClick={() => setOpen(false)}
           />
           <nav
-            className="absolute left-0 top-0 flex h-full w-[min(100%,20rem)] flex-col bg-white shadow-xl"
+            className="absolute right-0 top-0 flex h-full w-[min(100%,20rem)] flex-col bg-white shadow-xl"
             aria-label="Aile menüsü"
             style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
           >
@@ -127,7 +141,12 @@ export function FamilyDrawerMenu({ role }: Props) {
                       <ul className="ml-3 space-y-0.5 border-l border-stone-200 pl-2">
                         {item.children.map((child) => (
                           <li key={child.id}>
-                            <MenuLink item={child} pathname={pathname} nested />
+                            <MenuLink
+                              item={child}
+                              pathname={pathname}
+                              nested
+                              onNavigate={() => setOpen(false)}
+                            />
                           </li>
                         ))}
                       </ul>
@@ -137,11 +156,26 @@ export function FamilyDrawerMenu({ role }: Props) {
 
                 return (
                   <li key={item.id}>
-                    <MenuLink item={item} pathname={pathname} />
+                    <MenuLink
+                      item={item}
+                      pathname={pathname}
+                      onNavigate={() => setOpen(false)}
+                    />
                   </li>
                 );
               })}
             </ul>
+
+            <div className="border-t border-stone-200 p-3">
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="w-full rounded-xl px-4 py-3 text-left text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:opacity-60 touch-manipulation"
+              >
+                {loggingOut ? "Çıkış yapılıyor…" : "Çıkış yap"}
+              </button>
+            </div>
           </nav>
         </div>
       )}
