@@ -117,6 +117,12 @@ export type FamilyMenuItem = {
 
 export type FamilyReadSegment = "sana" | "cocuklar" | "torunlar";
 
+export const FAMILY_READ_WIFE_SUBTITLES: Record<FamilyReadSegment, string> = {
+  sana: "Arjen'in yalnızca sana yazdığı metinler.",
+  cocuklar: "Çocuklarınız için yazılmış metinler.",
+  torunlar: "Torunlarınız için yazılmış metinler.",
+};
+
 export const FAMILY_READ_PATH: Record<FamilyReadSegment, string> = {
   sana: "/aile/oku/sana",
   cocuklar: "/aile/oku/cocuklar",

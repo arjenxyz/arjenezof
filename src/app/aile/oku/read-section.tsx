@@ -9,6 +9,7 @@ import {
   defaultReadPathForRole,
   FAMILY_READ_DESCRIPTIONS,
   FAMILY_READ_LABELS,
+  FAMILY_READ_WIFE_SUBTITLES,
   FAMILY_SECTIONS,
   type FamilyReadSegment,
   type FamilyRole,
@@ -36,9 +37,18 @@ export async function renderFamilyReadSection({ role, segment, arjenOnly = false
 
     const section = FAMILY_SECTIONS[role][audience];
     const introOverride =
-      segment === "sana"
-        ? "Arjen'in yalnızca sana yazdığı metinler."
-        : section?.subtitle ?? FAMILY_READ_DESCRIPTIONS[segment];
+      role === "wife"
+        ? FAMILY_READ_WIFE_SUBTITLES[segment]
+        : segment === "sana"
+          ? "Arjen'in yalnızca sana yazdığı metinler."
+          : section?.subtitle ?? FAMILY_READ_DESCRIPTIONS[segment];
+
+    const sectionSubtitle =
+      role === "wife"
+        ? FAMILY_READ_WIFE_SUBTITLES[segment]
+        : segment === "sana"
+          ? FAMILY_READ_DESCRIPTIONS.sana
+          : section?.subtitle;
 
     return {
       content: (
@@ -48,7 +58,7 @@ export async function renderFamilyReadSection({ role, segment, arjenOnly = false
             messages={messages}
             filterAudience={audience}
             sectionTitle={segment === "sana" ? FAMILY_READ_LABELS.sana : section?.title}
-            sectionSubtitle={segment === "sana" ? FAMILY_READ_DESCRIPTIONS.sana : section?.subtitle}
+            sectionSubtitle={sectionSubtitle}
             emptyMessage={
               segment === "sana"
                 ? "Henüz sana özel bir yazı yok."

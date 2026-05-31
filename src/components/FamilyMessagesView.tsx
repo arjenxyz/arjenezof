@@ -1,9 +1,6 @@
-import Link from "next/link";
-import { formatDate } from "@/lib/nodes-shared";
+import { FamilyMessageCard } from "@/components/FamilyMessageCard";
 import { familyAudienceAccentClass } from "@/components/FamilyAudienceBadge";
-import { WifeMessageEditLink } from "@/components/WifeMessageEditLink";
 import type { FamilyMessageRecord } from "@/lib/family";
-import { wifeCanManageMessage } from "@/lib/family-write-access";
 import {
   FAMILY_SECTIONS,
   sectionsForRole,
@@ -19,49 +16,6 @@ type Props = {
   sectionSubtitle?: string;
   emptyMessage?: string;
 };
-
-function MessageCard({
-  message,
-  showOwnLabel,
-  readerRole,
-}: {
-  message: FamilyMessageRecord;
-  showOwnLabel?: boolean;
-  readerRole: FamilyRole;
-}) {
-  const familyAuthorLabel =
-    readerRole === "children" && message.authorRole === "wife"
-      ? "Annenden"
-      : readerRole === "grandchildren" && message.authorRole === "wife"
-        ? "Büyükannenden"
-        : null;
-
-  const isOwnMessage = showOwnLabel && wifeCanManageMessage(message);
-
-  return (
-    <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition hover:border-[#8fa38e] hover:shadow sm:p-5">
-      <Link href={`/aile/metin/${message.id}`} className="block touch-manipulation">
-        {isOwnMessage && <p className="mb-2 text-xs font-medium text-rose-700">Senin yazın</p>}
-        {familyAuthorLabel && (
-          <p className="mb-2 text-xs font-medium text-rose-700">{familyAuthorLabel}</p>
-        )}
-        <h3 className="font-serif text-lg text-stone-900">{message.title}</h3>
-        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-stone-600">{message.content}</p>
-        {message.mediaType && (
-          <p className="mt-2 text-xs text-stone-400">
-            {message.mediaType === "image"
-              ? "Görsel eklendi"
-              : message.mediaType === "audio"
-                ? "Ses eklendi"
-                : "Video eklendi"}
-          </p>
-        )}
-        <p className="mt-3 text-xs text-stone-500">{formatDate(message.updatedAt)}</p>
-      </Link>
-      {isOwnMessage && <WifeMessageEditLink message={message} className="mt-3" />}
-    </div>
-  );
-}
 
 function SingleSection({
   audience,
@@ -80,20 +34,37 @@ function SingleSection({
 }) {
   return (
     <section className="mt-8" aria-labelledby={`family-section-${audience}`}>
-      <div className={`rounded-r-xl border-l-4 py-1 pl-4 ${familyAudienceAccentClass(audience)}`}>
-        <h2 id={`family-section-${audience}`} className="font-serif text-xl text-stone-900 sm:text-2xl">
-          {title}
-        </h2>
-        {subtitle && <p className="mt-1 text-sm text-stone-600">{subtitle}</p>}
+      <div className={`rounded-2xl border border-stone-200 bg-white/70 p-4 sm:p-5 ${familyAudienceAccentClass(audience)} border-l-4`}>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 id={`family-section-${audience}`} className="font-serif text-xl text-stone-900 sm:text-2xl">
+              {title}
+            </h2>
+            {subtitle && <p className="mt-1 text-sm leading-relaxed text-stone-600">{subtitle}</p>}
+          </div>
+          {messages.length > 0 && (
+            <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
+              {messages.length} yazı
+            </span>
+          )}
+        </div>
       </div>
 
       {messages.length === 0 ? (
-        <p className="mt-4 pl-4 text-sm text-stone-400">{emptyMessage}</p>
+        <p className="mt-4 rounded-xl border border-dashed border-stone-300 bg-white/60 px-4 py-8 text-center text-sm text-stone-500">
+          {emptyMessage}
+        </p>
       ) : (
-        <ul className="mt-4 space-y-3">
+        <ul className="mt-4 space-y-4">
           {messages.map((message) => (
             <li key={message.id}>
-              <MessageCard message={message} showOwnLabel={role === "wife"} readerRole={role} />
+              <FamilyMessageCard
+                message={message}
+                readerRole={role}
+                href={`/aile/metin/${message.id}`}
+                variant="read"
+                showOwnLabel={role === "wife"}
+              />
             </li>
           ))}
         </ul>
@@ -140,7 +111,12 @@ export function FamilyMessagesView({
       <ul className="mt-8 space-y-4">
         {messages.map((message) => (
           <li key={message.id}>
-            <MessageCard message={message} readerRole={role} />
+            <FamilyMessageCard
+              message={message}
+              readerRole={role}
+              href={`/aile/metin/${message.id}`}
+              variant="read"
+            />
           </li>
         ))}
       </ul>
@@ -155,31 +131,15 @@ export function FamilyMessagesView({
         if (!section) return null;
 
         return (
-          <section key={audience} aria-labelledby={`family-section-${audience}`}>
-            <div
-              className={`rounded-r-xl border-l-4 py-1 pl-4 ${familyAudienceAccentClass(audience)}`}
-            >
-              <h2
-                id={`family-section-${audience}`}
-                className="font-serif text-xl text-stone-900 sm:text-2xl"
-              >
-                {section.title}
-              </h2>
-              <p className="mt-1 text-sm text-stone-600">{section.subtitle}</p>
-            </div>
-
-            {items.length === 0 ? (
-              <p className="mt-4 pl-4 text-sm text-stone-400">Henüz bu bölüme yazı eklenmemiş.</p>
-            ) : (
-              <ul className="mt-4 space-y-3">
-                {items.map((message) => (
-                  <li key={message.id}>
-                    <MessageCard message={message} showOwnLabel={role === "wife"} readerRole={role} />
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+          <SingleSection
+            key={audience}
+            audience={audience}
+            title={section.title}
+            subtitle={section.subtitle}
+            messages={items}
+            role={role}
+            emptyMessage="Henüz bu bölüme yazı eklenmemiş."
+          />
         );
       })}
     </div>

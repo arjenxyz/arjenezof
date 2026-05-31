@@ -36,3 +36,11 @@ export function familyAudienceAccentClass(audience: FamilyAudience) {
     grandchildren: "border-amber-300 bg-amber-50/30",
   }[audience];
 }
+
+export function familyAudienceCardBorderClass(audience: FamilyAudience) {
+  return {
+    wife: "border-l-rose-300",
+    children: "border-l-sky-300",
+    grandchildren: "border-l-amber-300",
+  }[audience];
+}

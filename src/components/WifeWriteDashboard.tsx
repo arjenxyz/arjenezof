@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatDate } from "@/lib/nodes-shared";
+import { FamilyMessageCard } from "@/components/FamilyMessageCard";
 import { familyAudienceAccentClass } from "@/components/FamilyAudienceBadge";
 import type { FamilyMessageRecord } from "@/lib/family";
 import {
@@ -21,21 +21,24 @@ export function WifeWriteDashboard({ messages, audience, authorReady = true }: P
 
   return (
     <div className="mt-8 space-y-8">
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <Link
           href={`${basePath}/yeni`}
-          className="rounded-lg bg-[#4a5d49] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#3d4d3c] touch-manipulation"
+          className="rounded-xl bg-[#4a5d49] px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#3d4d3c] touch-manipulation"
         >
           + Yeni yazı
         </Link>
+        {items.length > 0 && (
+          <span className="text-sm text-stone-500">{items.length} yazı kayıtlı</span>
+        )}
       </div>
 
       <section>
         <div
-          className={`rounded-r-xl border-l-4 py-1 pl-4 ${familyAudienceAccentClass(audience)}`}
+          className={`rounded-2xl border border-stone-200 bg-white/70 p-4 sm:p-5 ${familyAudienceAccentClass(audience)} border-l-4`}
         >
           <h2 className="font-serif text-xl text-stone-900">{section.title}</h2>
-          <p className="mt-1 text-sm text-stone-600">Senin yazdıkların</p>
+          <p className="mt-1 text-sm text-stone-600">Senin yazdıkların — buradan düzenleyebilirsin.</p>
         </div>
 
         {items.length === 0 ? (
@@ -52,22 +55,16 @@ export function WifeWriteDashboard({ messages, audience, authorReady = true }: P
             )}
           </div>
         ) : (
-          <ul className="mt-4 space-y-2">
+          <ul className="mt-4 space-y-4">
             {items.map((message) => (
               <li key={message.id}>
-                <Link
+                <FamilyMessageCard
+                  message={message}
+                  readerRole="wife"
                   href={`${basePath}/${message.id}/duzenle`}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3 transition hover:border-[#8fa38e] touch-manipulation"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate font-medium text-stone-900">{message.title}</p>
-                    <p className="mt-1 text-xs text-stone-500">
-                      {formatDate(message.updatedAt)}
-                      {message.mediaType ? ` · ${message.mediaType === "image" ? "Görsel" : message.mediaType === "audio" ? "Ses" : "Video"}` : ""}
-                    </p>
-                  </div>
-                  <span className="shrink-0 text-sm text-[#4a5d49]">Düzenle →</span>
-                </Link>
+                  variant="write"
+                  showOwnLabel
+                />
               </li>
             ))}
           </ul>
