@@ -102,17 +102,20 @@ export function FamilyDrawerMenu({ role }: Props) {
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50">
+        <div className="fixed inset-0 z-[60]">
           <button
             type="button"
-            className="absolute inset-0 bg-stone-900/40"
+            className="absolute inset-0 bg-stone-900/25 backdrop-blur-md"
             aria-label="Menüyü kapat"
             onClick={() => setOpen(false)}
           />
           <nav
-            className="absolute right-0 top-0 flex h-full w-[min(100%,20rem)] flex-col bg-white shadow-xl"
+            className="absolute right-0 top-0 flex h-full w-[min(100%,20rem)] flex-col bg-white shadow-2xl"
             aria-label="Aile menüsü"
-            style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+            style={{
+              paddingTop: "env(safe-area-inset-top, 0px)",
+              paddingBottom: "env(safe-area-inset-bottom, 0px)",
+            }}
           >
             <div className="flex items-center justify-between border-b border-stone-200 px-4 py-4">
               <p className="text-sm font-medium text-stone-900">Menü</p>
@@ -166,7 +169,10 @@ export function FamilyDrawerMenu({ role }: Props) {
               })}
             </ul>
 
-            <div className="border-t border-stone-200 p-3">
+            <div
+              className="shrink-0 border-t border-stone-200 bg-white p-3"
+              style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom, 0px))" }}
+            >
               <button
                 type="button"
                 onClick={handleLogout}
