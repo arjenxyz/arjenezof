@@ -4,9 +4,10 @@ import type { ThoughtNodeRecord } from "@/lib/nodes-shared";
 type Props = {
   title: string;
   writings: ThoughtNodeRecord[];
+  topicTitles?: Record<string, string>;
 };
 
-export function RelatedWritingsSection({ title, writings }: Props) {
+export function RelatedWritingsSection({ title, writings, topicTitles }: Props) {
   if (writings.length === 0) return null;
 
   return (
@@ -20,6 +21,11 @@ export function RelatedWritingsSection({ title, writings }: Props) {
               className="block rounded-lg border border-stone-200 bg-white px-3 py-3 transition hover:border-[#8fa38e] touch-manipulation sm:px-4"
             >
               <span className="font-medium text-stone-900">{writing.title}</span>
+              {topicTitles?.[writing.topicId] && (
+                <span className="mt-1 block text-xs text-stone-500">
+                  {topicTitles[writing.topicId]}
+                </span>
+              )}
             </Link>
           </li>
         ))}

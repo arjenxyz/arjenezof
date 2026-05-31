@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
+import { siteUrl } from "@/lib/site";
 
 const serif = Cormorant_Garamond({
   subsets: ["latin", "latin-ext"],
@@ -14,12 +15,18 @@ const sans = Source_Sans_3({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: {
     default: "Bu düşüncelerde ne? | Arjen",
     template: "%s | Bu düşüncelerde ne?",
   },
   description:
     "Arjen'in akıl denemeleri: din, tanrı, yaşam, doğa ve varoluş üzerine düşünceler.",
+  openGraph: {
+    type: "website",
+    locale: "tr_TR",
+    siteName: "Bu düşüncelerde ne?",
+  },
 };
 
 export const viewport = {

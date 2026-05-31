@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { HeaderSearch } from "@/components/HeaderSearch";
 
 export function Header() {
   const pathname = usePathname();
@@ -19,7 +20,8 @@ export function Header() {
           </h1>
         </Link>
         {!isAdmin && (
-          <nav className="flex shrink-0 items-center gap-1 sm:gap-4">
+          <nav className="flex shrink-0 items-center gap-1 sm:gap-3">
+            <HeaderSearch />
             <Link
               href="/"
               className="rounded-lg px-3 py-2 text-sm text-stone-600 transition hover:bg-stone-100 hover:text-stone-900 touch-manipulation"
@@ -27,8 +29,14 @@ export function Header() {
               Konular
             </Link>
             <Link
+              href="/ara"
+              className="rounded-lg px-3 py-2 text-sm text-stone-600 transition hover:bg-stone-100 hover:text-stone-900 touch-manipulation sm:hidden"
+            >
+              Ara
+            </Link>
+            <Link
               href="/hakkinda"
-              className="rounded-lg px-3 py-2 text-sm text-stone-600 transition hover:bg-stone-100 hover:text-stone-900 touch-manipulation"
+              className="hidden rounded-lg px-3 py-2 text-sm text-stone-600 transition hover:bg-stone-100 hover:text-stone-900 touch-manipulation sm:inline-block"
             >
               Hakkında
             </Link>

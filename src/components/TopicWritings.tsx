@@ -7,9 +7,10 @@ import type { ThoughtNodeRecord } from "@/lib/nodes-shared";
 
 type Props = {
   writings: ThoughtNodeRecord[];
+  parentTitles: Record<string, string>;
 };
 
-export function TopicWritings({ writings }: Props) {
+export function TopicWritings({ writings, parentTitles }: Props) {
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const tags = useMemo(() => collectTagsFromWritings(writings), [writings]);
 
@@ -63,7 +64,12 @@ export function TopicWritings({ writings }: Props) {
       <ul className="space-y-4 sm:space-y-5">
         {filtered.map((writing) => (
           <li key={writing.id}>
-            <WritingCard writing={writing} />
+            <WritingCard
+              writing={writing}
+              continuesFromTitle={
+                writing.parentId ? parentTitles[writing.parentId] : undefined
+              }
+            />
           </li>
         ))}
       </ul>

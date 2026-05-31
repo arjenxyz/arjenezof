@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { SiteErrorPanel } from "@/components/SiteErrorPanel";
 import { TopicCard } from "@/components/TopicCard";
+import { WritingCard } from "@/components/WritingCard";
 import { collectTagsFromWritings } from "@/lib/discovery";
 import { getDatabaseErrorMessage } from "@/lib/db-errors";
 import { getAllPublishedWritings } from "@/lib/nodes";
@@ -22,6 +23,7 @@ export default async function HomePage() {
       })),
     );
     const interestTags = collectTagsFromWritings(allWritings).slice(0, 12);
+    const recentWritings = allWritings.slice(0, 5);
 
     return (
       <>
@@ -35,10 +37,45 @@ export default async function HomePage() {
               Konular
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-stone-600 sm:mt-4 sm:text-base">
-              Denemelerini konu konu grupla. Etiketlerle ilgi alanlarına göre keşfedilebilir
-              metinler yaz — kuşlar, felsefe, günlük hayat… sınır yok.
+              Konulara göz at, ilgi alanı etiketlerine tıkla ve metinleri oku. Her metin bir
+              düşünce denemesi — kesin cevap değil, soruların izi.
             </p>
+            {allWritings.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-3">
+                <Link
+                  href="/rastgele"
+                  className="rounded-lg bg-[#4a5d49] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#3d4d3c] touch-manipulation"
+                >
+                  Rastgele oku
+                </Link>
+                <Link
+                  href="/ara"
+                  className="rounded-lg border border-stone-300 px-4 py-2.5 text-sm text-stone-700 transition hover:bg-stone-50 touch-manipulation"
+                >
+                  Metinlerde ara
+                </Link>
+              </div>
+            )}
           </section>
+
+          {recentWritings.length > 0 && (
+            <section className="mb-10">
+              <h3 className="mb-4 font-serif text-xl text-stone-900 sm:text-2xl">Son yazılar</h3>
+              <ul className="space-y-4 sm:space-y-5">
+                {recentWritings.map((writing) => (
+                  <li key={writing.id}>
+                    <WritingCard
+                      writing={writing}
+                      topicTitle={
+                        topicsWithCounts.find(({ topic }) => topic.id === writing.topicId)?.topic
+                          .title
+                      }
+                    />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           {interestTags.length > 0 && (
             <section className="mb-8">

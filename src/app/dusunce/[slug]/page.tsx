@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CopyLinkButton } from "@/components/CopyLinkButton";
 import { Header } from "@/components/Header";
 import { RelatedWritingsSection } from "@/components/RelatedWritingsSection";
 import { SiteErrorPanel } from "@/components/SiteErrorPanel";
 import { getDatabaseErrorMessage } from "@/lib/db-errors";
-import { formatDate, getNodeBySlug, parseTags } from "@/lib/nodes";
-import { getTopicById } from "@/lib/topics";
+import { estimateReadingMinutes, formatDate, getNodeBySlug, parseTags } from "@/lib/nodes";
+import { siteUrl } from "@/lib/site";
+import { getAllTopics, getTopicById } from "@/lib/topics";
 
 export const dynamic = "force-dynamic";
 
@@ -19,9 +21,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params;
     const node = await getNodeBySlug(slug);
     if (!node) return { title: "Metin bulunamadı" };
+
+    const description = node.content.slice(0, 160);
+    const url = `${siteUrl()}/dusunce/${slug}`;
+
     return {
       title: node.title,
-      description: node.content.slice(0, 160),
+      description,
+      openGraph: {
+        title: node.title,
+        description,
+        url,
+        type: "article",
+        locale: "tr_TR",
+      },
+      twitter: {
+        card: "summary",
+        title: node.title,
+        description,
+      },
     };
   } catch {
     return { title: "Metin yüklenemedi" };
@@ -35,8 +53,11 @@ export default async function WritingDetailPage({ params }: Props) {
     const node = await getNodeBySlug(slug);
     if (!node) notFound();
 
-    const topic = await getTopicById(node.topicId);
+    const [topic, topics] = await Promise.all([getTopicById(node.topicId), getAllTopics()]);
+    const topicTitles = Object.fromEntries(topics.map((item) => [item.id, item.title]));
     const tags = parseTags(node.tags);
+    const readingMinutes = estimateReadingMinutes(node.content);
+    const pageUrl = `${siteUrl()}/dusunce/${slug}`;
 
     return (
       <>
@@ -59,12 +80,25 @@ export default async function WritingDetailPage({ params }: Props) {
             )}
           </nav>
 
-          <h1 className="mt-4 font-serif text-2xl leading-tight text-stone-900 sm:mt-6 sm:text-4xl">
+          {node.continuesFrom && (
+            <p className="mt-4 text-sm text-stone-600 sm:mt-6">
+              Bu metin{" "}
+              <Link
+                href={`/dusunce/${node.continuesFrom.slug}`}
+                className="font-medium text-[#4a5d49] hover:underline"
+              >
+                {node.continuesFrom.title}
+              </Link>{" "}
+              metninin devamıdır.
+            </p>
+          )}
+
+          <h1 className="mt-3 font-serif text-2xl leading-tight text-stone-900 sm:mt-4 sm:text-4xl">
             {node.title}
           </h1>
 
           <p className="mt-3 text-sm text-stone-500">
-            Son güncelleme: {formatDate(node.updatedAt)}
+            Son güncelleme: {formatDate(node.updatedAt)} · ~{readingMinutes} dk okuma
           </p>
 
           {tags.length > 0 && (
@@ -85,16 +119,20 @@ export default async function WritingDetailPage({ params }: Props) {
             {node.content}
           </article>
 
-          {node.continuesFrom && (
-            <RelatedWritingsSection title="Önceki metin" writings={[node.continuesFrom]} />
-          )}
-
           {node.continuations.length > 0 && (
             <RelatedWritingsSection title="Devamı" writings={node.continuations} />
           )}
 
+          <div className="mt-6">
+            <CopyLinkButton url={pageUrl} />
+          </div>
+
           {node.relatedWritings.length > 0 && (
-            <RelatedWritingsSection title="Benzer okumalar" writings={node.relatedWritings} />
+            <RelatedWritingsSection
+              title="Benzer okumalar"
+              writings={node.relatedWritings}
+              topicTitles={topicTitles}
+            />
           )}
         </main>
       </>

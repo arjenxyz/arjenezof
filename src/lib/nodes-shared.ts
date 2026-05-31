@@ -64,6 +64,11 @@ export function formatDate(date: Date) {
   }).format(date);
 }
 
+export function estimateReadingMinutes(content: string) {
+  const words = content.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
+
 export function countNodes(nodes: ThoughtNodeWithChildren[]): number {
   return nodes.reduce((sum, node) => sum + 1 + countNodes(node.children), 0);
 }

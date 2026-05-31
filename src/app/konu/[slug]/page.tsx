@@ -36,6 +36,7 @@ export default async function TopicPage({ params }: Props) {
     if (!topic) notFound();
 
     const writings = await getPublishedWritingsByTopic(topic.id);
+    const parentTitles = Object.fromEntries(writings.map((w) => [w.id, w.title]));
 
     return (
       <>
@@ -65,7 +66,16 @@ export default async function TopicPage({ params }: Props) {
             )}
           </section>
 
-          <TopicWritings writings={writings} />
+          <TopicWritings writings={writings} parentTitles={parentTitles} />
+
+          {writings.length === 0 && (
+            <div className="rounded-xl border border-dashed border-stone-300 bg-white p-6 text-center text-sm text-stone-600">
+              <p>Bu konuda henüz metin yok.</p>
+              <Link href="/" className="mt-3 inline-block text-[#4a5d49] hover:underline">
+                Diğer konulara göz at →
+              </Link>
+            </div>
+          )}
         </main>
         <footer className="border-t border-stone-200/80 px-4 py-6 text-center text-xs text-stone-500 sm:py-8 sm:text-sm">
           © {new Date().getFullYear()} Arjen — Bu düşüncelerde ne?

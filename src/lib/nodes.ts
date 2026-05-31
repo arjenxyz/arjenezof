@@ -1,6 +1,7 @@
 import { createSupabaseAdmin, TABLE } from "@/lib/supabase";
 import { discoverRelatedWritings } from "@/lib/discovery";
 import {
+  estimateReadingMinutes,
   formatDate,
   parseTags,
   slugify,
@@ -8,7 +9,7 @@ import {
 } from "@/lib/nodes-shared";
 
 export type { ThoughtNodeRecord as ThoughtNode };
-export { formatDate, parseTags, slugify };
+export { estimateReadingMinutes, formatDate, parseTags, slugify };
 
 type DbRow = {
   id: string;
@@ -98,6 +99,27 @@ export async function getPublishedWritingsByTag(tag: string) {
   return writings.filter((writing) =>
     parseTags(writing.tags).some((item) => item.toLowerCase() === needle),
   );
+}
+
+export async function searchPublishedWritings(query: string) {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+
+  const writings = await getAllPublishedWritings();
+  const needle = trimmed.toLocaleLowerCase("tr");
+
+  return writings.filter(
+    (writing) =>
+      writing.title.toLocaleLowerCase("tr").includes(needle) ||
+      writing.content.toLocaleLowerCase("tr").includes(needle) ||
+      parseTags(writing.tags).some((tag) => tag.toLocaleLowerCase("tr").includes(needle)),
+  );
+}
+
+export async function getRandomPublishedWriting() {
+  const writings = await getAllPublishedWritings();
+  if (writings.length === 0) return null;
+  return writings[Math.floor(Math.random() * writings.length)] ?? null;
 }
 
 export async function getAllNodesByTopic(topicId: string) {

@@ -3,8 +3,10 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { SiteErrorPanel } from "@/components/SiteErrorPanel";
 import { WritingCard } from "@/components/WritingCard";
+import { getRelatedTagsForTag } from "@/lib/discovery";
 import { getDatabaseErrorMessage } from "@/lib/db-errors";
-import { getPublishedWritingsByTag } from "@/lib/nodes";
+import { getAllPublishedWritings, getPublishedWritingsByTag } from "@/lib/nodes";
+import { getAllTopics } from "@/lib/topics";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +26,13 @@ export default async function TagPage({ params }: Props) {
   const decodedTag = decodeURIComponent(tag);
 
   try {
-    const writings = await getPublishedWritingsByTag(decodedTag);
+    const [writings, allWritings, topics] = await Promise.all([
+      getPublishedWritingsByTag(decodedTag),
+      getAllPublishedWritings(),
+      getAllTopics(),
+    ]);
+    const topicById = new Map(topics.map((topic) => [topic.id, topic.title]));
+    const relatedTags = getRelatedTagsForTag(allWritings, decodedTag);
 
     return (
       <>
@@ -45,15 +53,33 @@ export default async function TagPage({ params }: Props) {
             <p className="mt-3 text-sm text-stone-600">
               Bu etiketle işaretlenmiş metinler — farklı konulardan benzer düşünceler.
             </p>
+            {relatedTags.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {relatedTags.map((item) => (
+                  <Link
+                    key={item}
+                    href={`/etiket/${encodeURIComponent(item)}`}
+                    className="rounded-full bg-stone-100 px-3 py-1 text-xs text-stone-600 transition hover:bg-[#eef2ed] hover:text-[#4a5d49]"
+                  >
+                    {item}
+                  </Link>
+                ))}
+              </div>
+            )}
           </section>
 
           {writings.length === 0 ? (
-            <p className="text-stone-500">Bu etiketle henüz metin yok.</p>
+            <div className="space-y-3 text-stone-500">
+              <p>Bu etiketle henüz metin yok.</p>
+              <Link href="/" className="text-sm text-[#4a5d49] hover:underline">
+                Konulara göz at →
+              </Link>
+            </div>
           ) : (
             <ul className="space-y-4 sm:space-y-5">
               {writings.map((writing) => (
                 <li key={writing.id}>
-                  <WritingCard writing={writing} />
+                  <WritingCard writing={writing} topicTitle={topicById.get(writing.topicId)} />
                 </li>
               ))}
             </ul>

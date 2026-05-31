@@ -58,3 +58,22 @@ export function discoverRelatedWritings(
 
   return results;
 }
+
+export function getRelatedTagsForTag(writings: ThoughtNodeRecord[], tag: string, limit = 8) {
+  const needle = tag.toLowerCase();
+  const counts = new Map<string, number>();
+
+  for (const writing of writings) {
+    const tags = parseTags(writing.tags).map((item) => item.toLowerCase());
+    if (!tags.includes(needle)) continue;
+    for (const item of tags) {
+      if (item === needle) continue;
+      counts.set(item, (counts.get(item) ?? 0) + 1);
+    }
+  }
+
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "tr"))
+    .slice(0, limit)
+    .map(([item]) => item);
+}
