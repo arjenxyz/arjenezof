@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { FamilyAudienceBadge } from "@/components/FamilyAudienceBadge";
 import { FamilyDetailHeader, FamilyShell } from "@/components/FamilyShell";
+import { WifeMessageEditLink } from "@/components/WifeMessageEditLink";
 import { SiteErrorPanel } from "@/components/SiteErrorPanel";
 import { formatDate } from "@/lib/nodes-shared";
 import { getDatabaseErrorMessage } from "@/lib/db-errors";
@@ -34,7 +36,7 @@ export default async function FamilyMessageDetailPage({ params }: Props) {
     const showContext = role === "wife" && message.audience !== "wife";
 
     return (
-      <FamilyShell role={role}>
+      <FamilyShell role={role} activeTab="read">
         <FamilyDetailHeader role={role} />
 
         <article className="mt-6 sm:mt-8">
@@ -42,6 +44,8 @@ export default async function FamilyMessageDetailPage({ params }: Props) {
             <p className="text-sm text-stone-500">{FAMILY_DETAIL_CONTEXT[message.audience]}</p>
           ) : role !== "wife" ? (
             <FamilyAudienceBadge audience={message.audience} />
+          ) : message.authorRole === "wife" ? (
+            <p className="text-sm font-medium text-rose-700">Senin yazın</p>
           ) : null}
 
           <h1 className="mt-3 font-serif text-2xl leading-tight text-stone-900 sm:text-4xl">
@@ -52,6 +56,12 @@ export default async function FamilyMessageDetailPage({ params }: Props) {
           <div className="prose-thought mt-6 rounded-xl border border-stone-200 bg-white p-4 text-base leading-relaxed text-stone-700 shadow-sm sm:mt-8 sm:p-6 sm:text-lg">
             {message.content}
           </div>
+
+          {role === "wife" && (
+            <div className="mt-6">
+              <WifeMessageEditLink message={message} />
+            </div>
+          )}
         </article>
       </FamilyShell>
     );

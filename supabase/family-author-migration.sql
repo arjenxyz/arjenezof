@@ -1,5 +1,9 @@
 -- Mevcut FamilyMessage tablosuna yazar alanı (eşin kendi yazıları)
 -- Supabase SQL Editor'da çalıştır
+--
+-- Eşin daha önce yazdığı metinler "admin" olarak kalmışsa, hangileri onun
+-- olduğunu biliyorsan şu komutla düzeltebilirsin (id'yi değiştir):
+-- UPDATE "FamilyMessage" SET "authorRole" = 'wife' WHERE "id" = '...';
 
 ALTER TABLE "FamilyMessage"
   ADD COLUMN IF NOT EXISTS "authorRole" TEXT NOT NULL DEFAULT 'admin';

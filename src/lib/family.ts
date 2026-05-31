@@ -158,8 +158,16 @@ export async function getFamilyMessageById(id: string) {
 }
 
 export async function getFamilyMessagesByAuthor(authorRole: FamilyAuthorRole) {
-  const messages = await getAllFamilyMessages();
-  return messages.filter((message) => message.authorRole === authorRole);
+  const supabase = createSupabaseAdmin();
+  const { data, error } = await supabase
+    .from(FAMILY_MESSAGE_TABLE)
+    .select("*")
+    .eq("authorRole", authorRole)
+    .order("sortOrder", { ascending: true })
+    .order("createdAt", { ascending: false });
+
+  if (error) throw error;
+  return ((data ?? []) as MessageRow[]).map(mapMessage);
 }
 
 export async function getFamilyMessageForRole(id: string, role: FamilyRole) {
@@ -181,6 +189,7 @@ type MessageInput = {
 export async function createFamilyMessage(input: MessageInput) {
   const supabase = createSupabaseAdmin();
   const now = new Date().toISOString();
+  const authorRole = input.authorRole ?? "admin";
 
   const { data, error } = await supabase
     .from(FAMILY_MESSAGE_TABLE)
@@ -191,7 +200,7 @@ export async function createFamilyMessage(input: MessageInput) {
       audience: input.audience,
       sortOrder: input.sortOrder ?? 0,
       published: input.published ?? true,
-      authorRole: input.authorRole ?? "admin",
+      authorRole,
       createdAt: now,
       updatedAt: now,
     })
@@ -199,7 +208,21 @@ export async function createFamilyMessage(input: MessageInput) {
     .single();
 
   if (error) throw error;
-  return mapMessage(data as MessageRow);
+
+  let message = mapMessage(data as MessageRow);
+  if (message.authorRole !== authorRole) {
+    const { data: fixed, error: fixError } = await supabase
+      .from(FAMILY_MESSAGE_TABLE)
+      .update({ authorRole, updatedAt: new Date().toISOString() })
+      .eq("id", message.id)
+      .select("*")
+      .single();
+
+    if (fixError) throw fixError;
+    message = mapMessage(fixed as MessageRow);
+  }
+
+  return message;
 }
 
 export async function updateFamilyMessage(id: string, input: MessageInput) {

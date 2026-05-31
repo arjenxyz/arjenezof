@@ -30,9 +30,14 @@ export function WifeWriteDashboard({ messages }: Props) {
       </div>
 
       {messages.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-stone-300 bg-white/60 p-8 text-center text-stone-500">
-          Henüz bir yazı eklemedin. İlk yazını oluşturmak için yukarıdaki butona bas.
-        </p>
+        <div className="rounded-xl border border-dashed border-stone-300 bg-white/60 p-8 text-center text-stone-600">
+          <p>Henüz bir yazı eklemedin.</p>
+          <p className="mt-2 text-sm text-stone-500">
+            Daha önce yazdığın metinler burada görünmüyorsa Supabase&apos;te{" "}
+            <code className="rounded bg-stone-100 px-1">family-author-migration.sql</code> dosyasını
+            çalıştırman gerekebilir.
+          </p>
+        </div>
       ) : (
         <div className="space-y-10">
           {sections.map((section) => (

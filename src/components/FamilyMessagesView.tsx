@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { formatDate } from "@/lib/nodes-shared";
 import { familyAudienceAccentClass } from "@/components/FamilyAudienceBadge";
+import { WifeMessageEditLink } from "@/components/WifeMessageEditLink";
 import type { FamilyMessageRecord } from "@/lib/family";
+import { wifeCanManageMessage } from "@/lib/family-write-access";
 import {
   FAMILY_SECTIONS,
   sectionsForRole,
@@ -29,21 +31,21 @@ function MessageCard({
         ? "Büyükannenden"
         : null;
 
+  const isOwnMessage = showOwnLabel && wifeCanManageMessage(message);
+
   return (
-    <Link
-      href={`/aile/metin/${message.id}`}
-      className="block rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition hover:border-[#8fa38e] hover:shadow touch-manipulation sm:p-5"
-    >
-      {showOwnLabel && message.authorRole === "wife" && (
-        <p className="mb-2 text-xs font-medium text-rose-700">Senin yazın</p>
-      )}
-      {familyAuthorLabel && (
-        <p className="mb-2 text-xs font-medium text-rose-700">{familyAuthorLabel}</p>
-      )}
-      <h3 className="font-serif text-lg text-stone-900">{message.title}</h3>
-      <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-stone-600">{message.content}</p>
-      <p className="mt-3 text-xs text-stone-500">{formatDate(message.updatedAt)}</p>
-    </Link>
+    <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition hover:border-[#8fa38e] hover:shadow sm:p-5">
+      <Link href={`/aile/metin/${message.id}`} className="block touch-manipulation">
+        {isOwnMessage && <p className="mb-2 text-xs font-medium text-rose-700">Senin yazın</p>}
+        {familyAuthorLabel && (
+          <p className="mb-2 text-xs font-medium text-rose-700">{familyAuthorLabel}</p>
+        )}
+        <h3 className="font-serif text-lg text-stone-900">{message.title}</h3>
+        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-stone-600">{message.content}</p>
+        <p className="mt-3 text-xs text-stone-500">{formatDate(message.updatedAt)}</p>
+      </Link>
+      {isOwnMessage && <WifeMessageEditLink message={message} className="mt-3" />}
+    </div>
   );
 }
 
