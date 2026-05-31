@@ -110,14 +110,70 @@ export function wifeWriteAudienceFromSegment(segment: string): WifeWriteAudience
 export type FamilyMenuItem = {
   id: string;
   label: string;
-  href: string;
+  href?: string;
   description?: string;
+  children?: FamilyMenuItem[];
 };
 
+export type FamilyReadSegment = "sana" | "cocuklar" | "torunlar";
+
+export const FAMILY_READ_PATH: Record<FamilyReadSegment, string> = {
+  sana: "/aile/oku/sana",
+  cocuklar: "/aile/oku/cocuklar",
+  torunlar: "/aile/oku/torunlar",
+};
+
+export const FAMILY_READ_LABELS: Record<FamilyReadSegment, string> = {
+  sana: "Arjen'in yazdıkları",
+  cocuklar: "Çocuklar",
+  torunlar: "Torunlar",
+};
+
+export const FAMILY_READ_DESCRIPTIONS: Record<FamilyReadSegment, string> = {
+  sana: "Sana özel yazılar",
+  cocuklar: "Çocuklarımız için yazılanlar",
+  torunlar: "Torunlarımız için yazılanlar",
+};
+
+export function audienceForReadSegment(segment: FamilyReadSegment): FamilyAudience {
+  if (segment === "sana") return "wife";
+  if (segment === "cocuklar") return "children";
+  return "grandchildren";
+}
+
+export function readPathForAudience(audience: FamilyAudience): string {
+  if (audience === "wife") return FAMILY_READ_PATH.sana;
+  if (audience === "children") return FAMILY_READ_PATH.cocuklar;
+  return FAMILY_READ_PATH.torunlar;
+}
+
+export function defaultReadPathForRole(role: FamilyRole): string {
+  if (role === "wife") return FAMILY_READ_PATH.sana;
+  if (role === "children") return FAMILY_READ_PATH.cocuklar;
+  return FAMILY_READ_PATH.torunlar;
+}
+
+export function readSegmentsForRole(role: FamilyRole): FamilyReadSegment[] {
+  if (role === "wife") return ["sana", "cocuklar", "torunlar"];
+  if (role === "children") return ["cocuklar"];
+  return ["torunlar"];
+}
+
+export function canAccessReadSegment(role: FamilyRole, segment: FamilyReadSegment): boolean {
+  return readSegmentsForRole(role).includes(segment);
+}
+
 export function familyMenuItemsForRole(role: FamilyRole): FamilyMenuItem[] {
+  const readItems: FamilyMenuItem[] = readSegmentsForRole(role).map((segment) => ({
+    id: `read-${segment}`,
+    label: FAMILY_READ_LABELS[segment],
+    href: FAMILY_READ_PATH[segment],
+    description: FAMILY_READ_DESCRIPTIONS[segment],
+  }));
+
   const items: FamilyMenuItem[] = [
     { id: "home", label: "Ana sayfa", href: "/aile", description: "Karşılama ekranı" },
-    { id: "read", label: "Oku", href: "/aile/oku", description: "Sana yazılan metinler" },
+    { id: "read", label: "Oku", children: readItems },
   ];
 
   if (role === "wife") {

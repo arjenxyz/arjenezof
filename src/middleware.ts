@@ -51,6 +51,7 @@ export async function middleware(request: NextRequest) {
 
   const needsFamilyAuth =
     pathname === "/aile/oku" ||
+    pathname.startsWith("/aile/oku/") ||
     pathname === "/aile/metinler" ||
     pathname.startsWith("/aile/metin/") ||
     pathname.startsWith("/aile/yaz");
@@ -78,6 +79,7 @@ export const config = {
   matcher: [
     "/admin/:path*",
     "/aile/oku",
+    "/aile/oku/:path*",
     "/aile/metinler",
     "/aile/metin/:path*",
     "/aile/yaz/:path*",

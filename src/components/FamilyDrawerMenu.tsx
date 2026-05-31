@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { familyMenuItemsForRole, type FamilyRole } from "@/lib/family-shared";
+import { familyMenuItemsForRole, type FamilyMenuItem, type FamilyRole } from "@/lib/family-shared";
 
 type Props = {
   role: FamilyRole;
@@ -12,6 +12,41 @@ type Props = {
 function isMenuActive(pathname: string, href: string) {
   if (href === "/aile") return pathname === "/aile";
   return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function isGroupActive(pathname: string, item: FamilyMenuItem) {
+  if (item.href && isMenuActive(pathname, item.href)) return true;
+  return item.children?.some((child) => child.href && isMenuActive(pathname, child.href)) ?? false;
+}
+
+function MenuLink({
+  item,
+  pathname,
+  nested,
+}: {
+  item: FamilyMenuItem;
+  pathname: string;
+  nested?: boolean;
+}) {
+  if (!item.href) return null;
+
+  const active = isMenuActive(pathname, item.href);
+
+  return (
+    <Link
+      href={item.href}
+      className={`block rounded-xl transition touch-manipulation ${
+        nested ? "px-3 py-2.5" : "px-4 py-3"
+      } ${
+        active ? "bg-[#eef2ed] text-[#4a5d49]" : "text-stone-800 hover:bg-stone-50"
+      }`}
+    >
+      <span className={`${nested ? "text-sm" : ""} font-medium`}>{item.label}</span>
+      {item.description && (
+        <span className="mt-1 block text-xs leading-relaxed text-stone-500">{item.description}</span>
+      )}
+    </Link>
+  );
 }
 
 export function FamilyDrawerMenu({ role }: Props) {
@@ -78,24 +113,31 @@ export function FamilyDrawerMenu({ role }: Props) {
 
             <ul className="flex-1 overflow-y-auto p-3">
               {items.map((item) => {
-                const active = isMenuActive(pathname, item.href);
+                if (item.children?.length) {
+                  const groupActive = isGroupActive(pathname, item);
+                  return (
+                    <li key={item.id} className="mb-1">
+                      <p
+                        className={`px-4 py-2 text-xs font-semibold uppercase tracking-wide ${
+                          groupActive ? "text-[#4a5d49]" : "text-stone-400"
+                        }`}
+                      >
+                        {item.label}
+                      </p>
+                      <ul className="ml-3 space-y-0.5 border-l border-stone-200 pl-2">
+                        {item.children.map((child) => (
+                          <li key={child.id}>
+                            <MenuLink item={child} pathname={pathname} nested />
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  );
+                }
+
                 return (
                   <li key={item.id}>
-                    <Link
-                      href={item.href}
-                      className={`block rounded-xl px-4 py-3 transition touch-manipulation ${
-                        active
-                          ? "bg-[#eef2ed] text-[#4a5d49]"
-                          : "text-stone-800 hover:bg-stone-50"
-                      }`}
-                    >
-                      <span className="font-medium">{item.label}</span>
-                      {item.description && (
-                        <span className="mt-1 block text-xs leading-relaxed text-stone-500">
-                          {item.description}
-                        </span>
-                      )}
-                    </Link>
+                    <MenuLink item={item} pathname={pathname} />
                   </li>
                 );
               })}

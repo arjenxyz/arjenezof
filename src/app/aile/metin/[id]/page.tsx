@@ -8,7 +8,7 @@ import { formatDate } from "@/lib/nodes-shared";
 import { getDatabaseErrorMessage } from "@/lib/db-errors";
 import { getFamilyMessageForRole } from "@/lib/family";
 import { getFamilySessionRole } from "@/lib/family-auth";
-import { FAMILY_DETAIL_CONTEXT } from "@/lib/family-shared";
+import { FAMILY_DETAIL_CONTEXT, readPathForAudience } from "@/lib/family-shared";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +37,7 @@ export default async function FamilyMessageDetailPage({ params }: Props) {
 
     return (
       <FamilyShell role={role}>
-        <FamilyDetailHeader backHref="/aile/oku" />
+        <FamilyDetailHeader backHref={readPathForAudience(message.audience)} />
 
         <article className="sm:mt-2">
           {showContext ? (

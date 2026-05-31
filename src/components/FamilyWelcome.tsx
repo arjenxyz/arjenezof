@@ -1,7 +1,11 @@
 import Link from "next/link";
 import {
   FAMILY_INTRO,
+  FAMILY_READ_DESCRIPTIONS,
+  FAMILY_READ_LABELS,
+  FAMILY_READ_PATH,
   WIFE_WRITE_PATH,
+  defaultReadPathForRole,
   type FamilyRole,
 } from "@/lib/family-shared";
 
@@ -39,29 +43,45 @@ export function FamilyWelcome({ role }: Props) {
     <div className="mt-8 space-y-4">
       {role === "wife" ? (
         <>
-          <WelcomeCard
-            href="/aile/oku"
-            title="Oku"
-            description="Arjen'in sana, çocuklara ve torunlara yazdığı metinleri oku."
-          />
+          <p className="text-sm font-medium text-stone-700">Oku</p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <WelcomeCard
+              href={FAMILY_READ_PATH.sana}
+              title={FAMILY_READ_LABELS.sana}
+              description={FAMILY_READ_DESCRIPTIONS.sana}
+              accent="border-l-4 border-l-rose-300"
+            />
+            <WelcomeCard
+              href={FAMILY_READ_PATH.cocuklar}
+              title={FAMILY_READ_LABELS.cocuklar}
+              description={FAMILY_READ_DESCRIPTIONS.cocuklar}
+              accent="border-l-4 border-l-sky-300"
+            />
+            <WelcomeCard
+              href={FAMILY_READ_PATH.torunlar}
+              title={FAMILY_READ_LABELS.torunlar}
+              description={FAMILY_READ_DESCRIPTIONS.torunlar}
+              accent="border-l-4 border-l-amber-300"
+            />
+          </div>
+
+          <p className="pt-2 text-sm font-medium text-stone-700">Yaz</p>
           <div className="grid gap-4 sm:grid-cols-2">
             <WelcomeCard
               href={WIFE_WRITE_PATH.children}
               title="Çocuklara yaz"
               description="Yazdıkların çocukların kendi panelinde görünür."
-              accent="border-l-4 border-l-sky-300"
             />
             <WelcomeCard
               href={WIFE_WRITE_PATH.grandchildren}
               title="Torunlara yaz"
               description="Yazdıkların torunların kendi panelinde görünür."
-              accent="border-l-4 border-l-amber-300"
             />
           </div>
         </>
       ) : (
         <WelcomeCard
-          href="/aile/oku"
+          href={defaultReadPathForRole(role)}
           title="Yazıları oku"
           description={FAMILY_INTRO[role]}
         />
