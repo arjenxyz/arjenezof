@@ -9,9 +9,12 @@ export function Header() {
   const isAdmin = pathname.startsWith("/admin");
 
   return (
-    <header className="sticky top-0 z-40 border-b border-stone-200/80 bg-[#f7f5f0]/95 backdrop-blur-sm">
+    <header
+      className="sticky top-0 z-40 border-b border-stone-200/80 bg-[#f7f5f0]/95 backdrop-blur-sm"
+      style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+    >
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-5">
-        <Link href="/" className="group min-w-0 flex-1">
+        <Link href="/" className="group min-w-0 flex-1 touch-manipulation">
           <p className="font-serif text-[10px] uppercase tracking-[0.2em] text-stone-500 sm:text-xs sm:tracking-[0.25em]">
             Arjen
           </p>
@@ -20,24 +23,17 @@ export function Header() {
           </h1>
         </Link>
         {!isAdmin && (
-          <nav className="flex shrink-0 items-center gap-1 sm:gap-3">
+          <nav className="hidden shrink-0 items-center gap-3 sm:flex">
             <HeaderSearch />
             <Link
               href="/aile"
               className="rounded-lg px-3 py-2 text-sm text-stone-600 transition hover:bg-stone-100 hover:text-stone-900 touch-manipulation"
             >
-              <span className="sm:hidden">Aile</span>
-              <span className="hidden sm:inline">Aile girişi</span>
-            </Link>
-            <Link
-              href="/ara"
-              className="rounded-lg px-3 py-2 text-sm text-stone-600 transition hover:bg-stone-100 hover:text-stone-900 touch-manipulation sm:hidden"
-            >
-              Ara
+              Aile girişi
             </Link>
             <Link
               href="/hakkinda"
-              className="hidden rounded-lg px-3 py-2 text-sm text-stone-600 transition hover:bg-stone-100 hover:text-stone-900 touch-manipulation sm:inline-block"
+              className="rounded-lg px-3 py-2 text-sm text-stone-600 transition hover:bg-stone-100 hover:text-stone-900 touch-manipulation"
             >
               Hakkında
             </Link>

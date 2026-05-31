@@ -12,7 +12,7 @@ export default async function FamilyLoginPage() {
   if (role) redirect("/aile/metinler");
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-10">
+    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-10 pb-[max(2.5rem,env(safe-area-inset-bottom))]">
       <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <p className="text-xs uppercase tracking-[0.2em] text-stone-500">Arjen</p>
         <h1 className="mt-2 font-serif text-2xl text-stone-900">Aileye özel</h1>

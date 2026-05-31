@@ -18,7 +18,12 @@ export function FamilyShell({ role, children, activeTab, introOverride }: Props)
     }`;
 
   return (
-    <main className="mx-auto min-h-screen max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
+    <main
+      className="mx-auto min-h-screen max-w-3xl px-4 py-6 sm:px-6 sm:py-10"
+      style={{
+        paddingBottom: "max(1.5rem, env(safe-area-inset-bottom, 0px))",
+      }}
+    >
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-stone-500">Arjen</p>

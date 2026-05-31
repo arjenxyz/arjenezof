@@ -33,7 +33,7 @@ export function WritingCard({ writing, topicTitle, continuesFromTitle }: Props) 
           <Link
             key={tag}
             href={`/etiket/${encodeURIComponent(tag)}`}
-            className="rounded-full bg-stone-100 px-2 py-0.5 text-stone-600 transition hover:bg-[#eef2ed] hover:text-[#4a5d49]"
+            className="inline-flex min-h-[32px] items-center rounded-full bg-stone-100 px-2.5 py-1 text-stone-600 transition hover:bg-[#eef2ed] hover:text-[#4a5d49] touch-manipulation"
           >
             {tag}
           </Link>
