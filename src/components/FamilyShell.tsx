@@ -70,11 +70,10 @@ export function FamilyBackLink({
   );
 }
 
-export function FamilyDetailHeader({ backHref }: { role: FamilyRole; backHref?: string }) {
+export function FamilyDetailHeader({ backHref }: { backHref?: string }) {
   return (
-    <div className="flex items-start justify-between gap-4">
+    <div className="mt-6">
       <FamilyBackLink href={backHref} />
-      <FamilyLogoutButton />
     </div>
   );
 }

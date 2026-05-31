@@ -37,9 +37,9 @@ export default async function FamilyMessageDetailPage({ params }: Props) {
 
     return (
       <FamilyShell role={role} activeTab="read">
-        <FamilyDetailHeader role={role} />
+        <FamilyDetailHeader />
 
-        <article className="mt-6 sm:mt-8">
+        <article className="sm:mt-2">
           {showContext ? (
             <p className="text-sm text-stone-500">{FAMILY_DETAIL_CONTEXT[message.audience]}</p>
           ) : role !== "wife" ? (

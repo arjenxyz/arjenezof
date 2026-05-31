@@ -23,10 +23,11 @@ export function Header() {
           <nav className="flex shrink-0 items-center gap-1 sm:gap-3">
             <HeaderSearch />
             <Link
-              href="/"
+              href="/aile"
               className="rounded-lg px-3 py-2 text-sm text-stone-600 transition hover:bg-stone-100 hover:text-stone-900 touch-manipulation"
             >
-              Konular
+              <span className="sm:hidden">Aile</span>
+              <span className="hidden sm:inline">Aile girişi</span>
             </Link>
             <Link
               href="/ara"
