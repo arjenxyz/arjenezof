@@ -32,8 +32,20 @@ function IconSearch({ active }: { active: boolean }) {
 function IconFamily({ active }: { active: boolean }) {
   const className = active ? "text-[#4a5d49]" : "text-stone-500";
   return (
-    <svg viewBox="0 0 24 24" className={`h-5 w-5 ${className}`} fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
-      <path d="M12 21s-6-4.35-6-10a4.5 4.5 0 0 1 8.1-2.7A4.5 4.5 0 0 1 18 11c0 5.65-6 10-6 10Z" strokeLinejoin="round" />
+    <svg
+      viewBox="0 0 24 24"
+      className={`h-5 w-5 ${className}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="3.5" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
     </svg>
   );
 }
