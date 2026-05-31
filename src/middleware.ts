@@ -50,6 +50,7 @@ export async function middleware(request: NextRequest) {
   }
 
   const needsFamilyAuth =
+    pathname === "/aile/oku" ||
     pathname === "/aile/metinler" ||
     pathname.startsWith("/aile/metin/") ||
     pathname.startsWith("/aile/yaz");
@@ -66,7 +67,7 @@ export async function middleware(request: NextRequest) {
     }
 
     if (pathname.startsWith("/aile/yaz") && familyRole !== "wife") {
-      return NextResponse.redirect(new URL("/aile/metinler", request.url));
+      return NextResponse.redirect(new URL("/aile/oku", request.url));
     }
   }
 
@@ -74,5 +75,11 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/aile/metinler", "/aile/metin/:path*", "/aile/yaz/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/aile/oku",
+    "/aile/metinler",
+    "/aile/metin/:path*",
+    "/aile/yaz/:path*",
+  ],
 };

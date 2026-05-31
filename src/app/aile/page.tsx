@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { FamilyLoginForm } from "@/components/FamilyLoginForm";
+import { FamilyShell } from "@/components/FamilyShell";
+import { FamilyWelcome } from "@/components/FamilyWelcome";
 import { getFamilySessionRole } from "@/lib/family-auth";
 
 export const metadata = {
@@ -9,7 +11,13 @@ export const metadata = {
 
 export default async function FamilyLoginPage() {
   const role = await getFamilySessionRole();
-  if (role) redirect("/aile/metinler");
+  if (role) {
+    return (
+      <FamilyShell role={role} hideIntro>
+        <FamilyWelcome role={role} />
+      </FamilyShell>
+    );
+  }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-10">

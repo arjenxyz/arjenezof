@@ -90,3 +90,52 @@ export function canViewFamilyMessage(viewerRole: FamilyRole, audience: FamilyAud
 export function audiencesVisibleToRole(role: FamilyRole): FamilyAudience[] {
   return FAMILY_AUDIENCES.filter((audience) => canViewFamilyMessage(role, audience));
 }
+
+export const WIFE_WRITE_PATH: Record<WifeWriteAudience, string> = {
+  children: "/aile/yaz/cocuklar",
+  grandchildren: "/aile/yaz/torunlar",
+};
+
+export const WIFE_WRITE_SEGMENT: Record<WifeWriteAudience, string> = {
+  children: "cocuklar",
+  grandchildren: "torunlar",
+};
+
+export function wifeWriteAudienceFromSegment(segment: string): WifeWriteAudience | null {
+  if (segment === "cocuklar") return "children";
+  if (segment === "torunlar") return "grandchildren";
+  return null;
+}
+
+export type FamilyMenuItem = {
+  id: string;
+  label: string;
+  href: string;
+  description?: string;
+};
+
+export function familyMenuItemsForRole(role: FamilyRole): FamilyMenuItem[] {
+  const items: FamilyMenuItem[] = [
+    { id: "home", label: "Ana sayfa", href: "/aile", description: "Karşılama ekranı" },
+    { id: "read", label: "Oku", href: "/aile/oku", description: "Sana yazılan metinler" },
+  ];
+
+  if (role === "wife") {
+    items.push(
+      {
+        id: "write-children",
+        label: "Çocuklara yaz",
+        href: WIFE_WRITE_PATH.children,
+        description: "Çocuklarının panelinde görünür",
+      },
+      {
+        id: "write-grandchildren",
+        label: "Torunlara yaz",
+        href: WIFE_WRITE_PATH.grandchildren,
+        description: "Torunlarının panelinde görünür",
+      },
+    );
+  }
+
+  return items;
+}

@@ -15,6 +15,8 @@ export async function POST(request: Request) {
     audience?: FamilyAudience;
     sortOrder?: number;
     published?: boolean;
+    mediaUrl?: string;
+    mediaType?: string;
   };
 
   if (!body.title?.trim() || !body.content?.trim() || !body.audience) {
@@ -42,6 +44,12 @@ export async function POST(request: Request) {
       sortOrder: body.sortOrder ?? 0,
       published: body.published ?? true,
       authorRole: actor.kind === "wife" ? "wife" : "admin",
+      mediaUrl: body.mediaUrl ?? "",
+      mediaType: (body.mediaType === "image" ||
+      body.mediaType === "audio" ||
+      body.mediaType === "video"
+        ? body.mediaType
+        : "") as "" | "image" | "audio" | "video",
     });
 
     if (actor.kind === "wife" && message.authorRole !== "wife") {

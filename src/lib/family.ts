@@ -4,6 +4,7 @@ import {
   type FamilyAuthorRole,
   type FamilyRole,
 } from "@/lib/family-shared";
+import type { FamilyMediaType } from "@/lib/family-media";
 import { hashFamilyPassword, verifyFamilyPassword } from "@/lib/family-auth";
 import { createSupabaseAdmin } from "@/lib/supabase";
 
@@ -18,6 +19,8 @@ export type FamilyMessageRecord = {
   sortOrder: number;
   published: boolean;
   authorRole: FamilyAuthorRole;
+  mediaUrl: string;
+  mediaType: FamilyMediaType | "";
   createdAt: Date;
   updatedAt: Date;
 };
@@ -30,6 +33,8 @@ type MessageRow = {
   sortOrder: number;
   published: boolean;
   authorRole?: FamilyAuthorRole;
+  mediaUrl?: string;
+  mediaType?: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -49,6 +54,12 @@ function mapMessage(row: MessageRow): FamilyMessageRecord {
     sortOrder: row.sortOrder,
     published: row.published,
     authorRole: row.authorRole ?? "admin",
+    mediaUrl: row.mediaUrl ?? "",
+    mediaType: (row.mediaType === "image" ||
+    row.mediaType === "audio" ||
+    row.mediaType === "video"
+      ? row.mediaType
+      : "") as FamilyMediaType | "",
     createdAt: new Date(row.createdAt),
     updatedAt: new Date(row.updatedAt),
   };
@@ -176,6 +187,14 @@ export async function getFamilyMessagesByAuthor(authorRole: FamilyAuthorRole) {
   return ((data ?? []) as MessageRow[]).map(mapMessage);
 }
 
+export async function getFamilyMessagesByAuthorAndAudience(
+  authorRole: FamilyAuthorRole,
+  audience: FamilyAudience,
+) {
+  const messages = await getFamilyMessagesByAuthor(authorRole);
+  return messages.filter((message) => message.audience === audience);
+}
+
 export async function getFamilyMessageForRole(id: string, role: FamilyRole) {
   const message = await getFamilyMessageById(id);
   if (!message || !message.published) return null;
@@ -190,7 +209,16 @@ type MessageInput = {
   sortOrder?: number;
   published?: boolean;
   authorRole?: FamilyAuthorRole;
+  mediaUrl?: string;
+  mediaType?: FamilyMediaType | "";
 };
+
+function mediaFields(input: MessageInput) {
+  return {
+    mediaUrl: input.mediaUrl ?? "",
+    mediaType: input.mediaType ?? "",
+  };
+}
 
 export async function createFamilyMessage(input: MessageInput) {
   const supabase = createSupabaseAdmin();
@@ -207,6 +235,7 @@ export async function createFamilyMessage(input: MessageInput) {
       sortOrder: input.sortOrder ?? 0,
       published: input.published ?? true,
       authorRole,
+      ...mediaFields(input),
       createdAt: now,
       updatedAt: now,
     })
@@ -242,6 +271,7 @@ export async function updateFamilyMessage(id: string, input: MessageInput) {
       audience: input.audience,
       sortOrder: input.sortOrder ?? 0,
       published: input.published ?? true,
+      ...mediaFields(input),
       updatedAt: new Date().toISOString(),
     })
     .eq("id", id)

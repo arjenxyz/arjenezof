@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { FamilyAudienceBadge } from "@/components/FamilyAudienceBadge";
 import { FamilyDetailHeader, FamilyShell } from "@/components/FamilyShell";
+import { FamilyMessageMedia } from "@/components/FamilyMessageMedia";
 import { WifeMessageEditLink } from "@/components/WifeMessageEditLink";
 import { SiteErrorPanel } from "@/components/SiteErrorPanel";
 import { formatDate } from "@/lib/nodes-shared";
@@ -36,8 +36,8 @@ export default async function FamilyMessageDetailPage({ params }: Props) {
     const showContext = role === "wife" && message.audience !== "wife";
 
     return (
-      <FamilyShell role={role} activeTab="read">
-        <FamilyDetailHeader />
+      <FamilyShell role={role}>
+        <FamilyDetailHeader backHref="/aile/oku" />
 
         <article className="sm:mt-2">
           {showContext ? (
@@ -56,6 +56,14 @@ export default async function FamilyMessageDetailPage({ params }: Props) {
           <div className="prose-thought mt-6 rounded-xl border border-stone-200 bg-white p-4 text-base leading-relaxed text-stone-700 shadow-sm sm:mt-8 sm:p-6 sm:text-lg">
             {message.content}
           </div>
+
+          {message.mediaUrl && message.mediaType && (
+            <FamilyMessageMedia
+              mediaUrl={message.mediaUrl}
+              mediaType={message.mediaType}
+              className="mt-6"
+            />
+          )}
 
           {role === "wife" && (
             <div className="mt-6">

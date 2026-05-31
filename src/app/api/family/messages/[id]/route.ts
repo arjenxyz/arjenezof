@@ -30,6 +30,8 @@ export async function PUT(request: Request, { params }: Params) {
     audience?: FamilyAudience;
     sortOrder?: number;
     published?: boolean;
+    mediaUrl?: string;
+    mediaType?: string;
   };
 
   if (!body.title?.trim() || !body.content?.trim() || !body.audience) {
@@ -50,6 +52,14 @@ export async function PUT(request: Request, { params }: Params) {
     sortOrder: body.sortOrder ?? 0,
     published: body.published ?? true,
     authorRole: existing.authorRole,
+    mediaUrl: body.mediaUrl ?? existing.mediaUrl,
+    mediaType: (body.mediaType === "image" ||
+    body.mediaType === "audio" ||
+    body.mediaType === "video"
+      ? body.mediaType
+      : body.mediaUrl === ""
+        ? ""
+        : existing.mediaType) as "" | "image" | "audio" | "video",
   });
 
   return NextResponse.json(message);

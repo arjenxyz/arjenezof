@@ -42,6 +42,11 @@ function MessageCard({
         )}
         <h3 className="font-serif text-lg text-stone-900">{message.title}</h3>
         <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-stone-600">{message.content}</p>
+        {message.mediaType && (
+          <p className="mt-2 text-xs text-stone-400">
+            {message.mediaType === "image" ? "Görsel eklendi" : message.mediaType === "audio" ? "Ses eklendi" : "Video eklendi"}
+          </p>
+        )}
         <p className="mt-3 text-xs text-stone-500">{formatDate(message.updatedAt)}</p>
       </Link>
       {isOwnMessage && <WifeMessageEditLink message={message} className="mt-3" />}

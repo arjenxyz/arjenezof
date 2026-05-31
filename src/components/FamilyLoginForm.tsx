@@ -27,7 +27,7 @@ export function FamilyLoginForm() {
       return;
     }
 
-    router.push("/aile/metinler");
+    router.push("/aile");
     router.refresh();
   }
 
