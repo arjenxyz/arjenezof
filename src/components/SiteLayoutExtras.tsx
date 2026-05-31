@@ -5,11 +5,7 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { PwaRegister } from "@/components/PwaRegister";
 
 function showMobileNav(pathname: string) {
-  return (
-    !pathname.startsWith("/admin") &&
-    !pathname.startsWith("/aile") &&
-    pathname !== "/offline"
-  );
+  return !pathname.startsWith("/admin") && pathname !== "/offline";
 }
 
 export function SiteLayoutExtras() {

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { FamilyLogoutButton } from "@/components/FamilyLogoutButton";
-import { SiteFooter } from "@/components/SiteFooter";
 import { FAMILY_GREETINGS, FAMILY_INTRO, type FamilyRole } from "@/lib/family-shared";
 
 type Props = {
@@ -54,7 +53,6 @@ export function FamilyShell({ role, children, activeTab, introOverride }: Props)
 
         {children}
       </div>
-      <SiteFooter />
     </div>
   );
 }
