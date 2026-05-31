@@ -20,9 +20,9 @@ export const FAMILY_GREETINGS: Record<FamilyRole, string> = {
 };
 
 export const FAMILY_INTRO: Record<FamilyRole, string> = {
-  wife: "Arjen'in sana ve aileye yazdığı metinler burada. İstersen çocuklar ve torunlar için de yazabilirsin.",
-  children: "Sana ve kardeşlerine yazılan metinler burada.",
-  grandchildren: "Büyükannene ve büyükbabandan sana yazılan metinler burada.",
+  wife: "Aile paneline hoş geldin. Okuma ve yazma bölümlerine menüden geçebilirsin.",
+  children: "Size yazılmış metinler bu bölümde listelenir.",
+  grandchildren: "Size yazılmış metinler bu bölümde listelenir.",
 };
 
 export type FamilySectionInfo = {
@@ -118,9 +118,9 @@ export type FamilyMenuItem = {
 export type FamilyReadSegment = "sana" | "cocuklar" | "torunlar";
 
 export const FAMILY_READ_WIFE_SUBTITLES: Record<FamilyReadSegment, string> = {
-  sana: "Arjen'in yalnızca sana yazdığı metinler.",
-  cocuklar: "Çocuklarınız için yazılmış metinler.",
-  torunlar: "Torunlarınız için yazılmış metinler.",
+  sana: "Sana yönelik, yalnızca senin erişebildiğin yazılar.",
+  cocuklar: "Çocuklar bölümünde listelenen yazılar.",
+  torunlar: "Torunlar bölümünde listelenen yazılar.",
 };
 
 export const FAMILY_READ_PATH: Record<FamilyReadSegment, string> = {
@@ -136,9 +136,9 @@ export const FAMILY_READ_LABELS: Record<FamilyReadSegment, string> = {
 };
 
 export const FAMILY_READ_DESCRIPTIONS: Record<FamilyReadSegment, string> = {
-  sana: "Sana özel yazılar",
-  cocuklar: "Çocuklarımız için yazılanlar",
-  torunlar: "Torunlarımız için yazılanlar",
+  sana: "Sana yönelik yazılar",
+  cocuklar: "Çocuklar bölümündeki yazılar",
+  torunlar: "Torunlar bölümündeki yazılar",
 };
 
 export function audienceForReadSegment(segment: FamilyReadSegment): FamilyAudience {
@@ -188,13 +188,13 @@ export function familyMenuItemsForRole(role: FamilyRole): FamilyMenuItem[] {
         id: "write-children",
         label: "Çocuklara yaz",
         href: WIFE_WRITE_PATH.children,
-        description: "Çocuklarının panelinde görünür",
+        description: "Çocuklar panelinde listelenir",
       },
       {
         id: "write-grandchildren",
         label: "Torunlara yaz",
         href: WIFE_WRITE_PATH.grandchildren,
-        description: "Torunlarının panelinde görünür",
+        description: "Torunlar panelinde listelenir",
       },
     );
   }

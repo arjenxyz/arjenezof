@@ -38,7 +38,7 @@ export function WifeWriteDashboard({ messages, audience, authorReady = true }: P
           className={`rounded-2xl border border-stone-200 bg-white/70 p-4 sm:p-5 ${familyAudienceAccentClass(audience)} border-l-4`}
         >
           <h2 className="font-serif text-xl text-stone-900">{section.title}</h2>
-          <p className="mt-1 text-sm text-stone-600">Senin yazdıkların — buradan düzenleyebilirsin.</p>
+          <p className="mt-1 text-sm text-stone-600">Bu bölümdeki yazıları görüntüleyebilir ve düzenleyebilirsin.</p>
         </div>
 
         {items.length === 0 ? (

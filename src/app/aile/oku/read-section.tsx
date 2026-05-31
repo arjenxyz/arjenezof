@@ -40,7 +40,7 @@ export async function renderFamilyReadSection({ role, segment, arjenOnly = false
       role === "wife"
         ? FAMILY_READ_WIFE_SUBTITLES[segment]
         : segment === "sana"
-          ? "Arjen'in yalnızca sana yazdığı metinler."
+          ? "Sana yönelik yazılar."
           : section?.subtitle ?? FAMILY_READ_DESCRIPTIONS[segment];
 
     const sectionSubtitle =

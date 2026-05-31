@@ -1,31 +1,32 @@
 export const WIFE_WELCOME = {
-  eyebrow: "Arjen · Aileye özel",
-  headline: "Merhaba.",
-  lead: "Bu alanı senin için, bizim ailemiz için yaptım. Herkese açık siteden ayrı; yalnızca ailemizin görebileceği, saklayabileceği bir köşe.",
+  eyebrow: "Arjen · Aile paneli",
+  headline: "Hoş geldin.",
+  lead: "Bu alan, aile üyelerine özel hazırlanmış bir bölümdür. Herkese açık siteden bağımsızdır; yalnızca şifreyle giriş yapan aile üyeleri erişebilir.",
   letter: {
-    title: "Neden burayı oluşturdum?",
+    title: "Bu alan neden var?",
     paragraphs: [
-      "Hayatın içinde söylemek isteyip zamanı gelmeyen, ya da kelimelerin yetmediği anlar oluyor. Bazen bir cümle, yıllar sonra bile insana iyi geliyor. Bu yüzden sana, çocuklarımıza ve torunlarımıza yazabileceğim — ve senin de onlara yazabileceğin — sessiz bir oda istedim.",
-      "Burada acele yok. Düşünceler birikebilir. Okumak istediğinde okursun; yazmak istediğinde yazarsın. Herkes kendi şifresiyle girer; çocuklar yalnızca kendilerine yazılanları, torunlar kendilerine yazılanları görür. Sen hepsini görebilirsin.",
-      "Bunu bir proje gibi değil, bir ev gibi düşün: içinde sen varsın, ben varım, çocuklarımız ve torunlarımız. Zamanla dolacak; belki yıllar sonra bir torun burada bir cümle okuyacak ve bizi bir anlığına yanında hissedecek.",
+      "Zaman içinde biriken düşünceleri, notları ve aileye yönelik yazıları tek bir yerde toplamak için bu paneli oluşturdum. Amaç; sana, çocuklarımıza ve torunlarımıza yazılan metinlerin düzenli, erişilebilir ve güvenli biçimde saklanmasıdır.",
+      "Her aile üyesi kendi şifresiyle giriş yapar. Çocuklar yalnızca kendilerine yazılan bölümü, torunlar kendilerine yazılan bölümü görür. Sen tüm bölümlere erişebilir ve çocuklar ile torunlar için yazı ekleyebilirsin.",
+      "Metinler istendiğinde okunabilir, istendiğinde güncellenebilir. Panel zamanla genişleyecek bir arşiv gibi çalışır; amacı günlük kullanım değil, uzun vadeli kayıt tutmaktır.",
     ],
   },
   goals: [
     {
       title: "Sana",
-      description: "Sana özel yazılar — yalnızca senin okuyabileceğin düşünceler, notlar, belki bazen söyleyemediklerim.",
+      description: "Yalnızca senin görebileceğin, sana yönelik yazılar.",
     },
     {
       title: "Çocuklarımıza",
-      description: "Onlara bırakmak istediğimiz sözler; sen de kendi sesinle onlara yazabilirsin.",
+      description: "Çocukların kendi panelinde okuyabileceği metinler. Sen de bu bölüme yazı ekleyebilirsin.",
     },
     {
       title: "Torunlarımıza",
-      description: "Henüz tanışmadığımız, ama kalbimizde yer edinen küçük insanlara uzanan bir köprü.",
+      description: "Torunların kendi panelinde okuyabileceği metinler. Sen de bu bölüme yazı ekleyebilirsin.",
     },
   ],
+  goalsIntro: "Panel üç ana bölümden oluşur:",
   closing:
-    "Bu alan dün de vardı, yarın da olacak. Şimdi sen geldin — hoş geldin. İstersen önce benim sana yazdıklarıma bak; istersen doğrudan çocuklara veya torunlara bir satır bırak.",
+    "Okuma ve yazma işlemlerine aşağıdaki bağlantılardan veya sağ üstteki menüden geçebilirsin.",
 } as const;
 
 export const FAMILY_WELCOME_OTHERS: Record<
@@ -33,13 +34,13 @@ export const FAMILY_WELCOME_OTHERS: Record<
   { headline: string; lead: string; note: string }
 > = {
   children: {
-    headline: "Merhaba.",
-    lead: "Babaannene, büyükbabandan ve annenden size yazılan metinler burada. Kardeşlerinle birlikte okuyabilirsin.",
-    note: "Sağ üstteki menüden yazılara ulaşabilirsin.",
+    headline: "Hoş geldin.",
+    lead: "Bu bölümde size, kardeşlerinize ve ailenize yazılmış metinler listelenir. Herkes kendi şifresiyle yalnızca kendisine açık içeriği görür.",
+    note: "Yazılara sağ üstteki menüden ulaşabilirsin.",
   },
   grandchildren: {
-    headline: "Merhaba.",
-    lead: "Büyükannenden ve büyükbabandan sana yazılan metinler burada.",
-    note: "Sağ üstteki menüden yazılara ulaşabilirsin.",
+    headline: "Hoş geldin.",
+    lead: "Bu bölümde sana yazılmış metinler listelenir. Giriş yalnızca sana verilen şifreyle yapılır.",
+    note: "Yazılara sağ üstteki menüden ulaşabilirsin.",
   },
 };

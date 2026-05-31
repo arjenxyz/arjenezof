@@ -61,10 +61,7 @@ function WifeWelcome() {
       </section>
 
       <section>
-        <h2 className="font-serif text-xl text-stone-900 sm:text-2xl">Ne hedefliyoruz?</h2>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-stone-600 sm:text-base">
-          Üç küçük oda — her biri farklı bir ses, farklı bir iz.
-        </p>
+        <h2 className="font-serif text-xl text-stone-900 sm:text-2xl">{WIFE_WELCOME.goalsIntro}</h2>
         <ul className="mt-5 grid gap-4 sm:grid-cols-3">
           {WIFE_WELCOME.goals.map((goal, index) => (
             <li
@@ -81,13 +78,12 @@ function WifeWelcome() {
         </ul>
       </section>
 
-      <section className="rounded-2xl border border-dashed border-[#b8c9b6] bg-[#f8faf7] px-6 py-5 sm:px-8">
-        <p className="text-base leading-relaxed text-stone-700 italic">{WIFE_WELCOME.closing}</p>
-        <p className="mt-4 text-sm text-stone-500">— Arjen</p>
+      <section className="rounded-2xl border border-stone-200 bg-stone-50 px-6 py-5 sm:px-8">
+        <p className="text-sm leading-relaxed text-stone-600">{WIFE_WELCOME.closing}</p>
       </section>
 
       <section>
-        <h2 className="font-serif text-xl text-stone-900">Nereden başlamak istersin?</h2>
+        <h2 className="font-serif text-xl text-stone-900">Bölümler</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <QuickLink
             href={FAMILY_READ_PATH.sana}
@@ -110,13 +106,13 @@ function WifeWelcome() {
           <QuickLink
             href={WIFE_WRITE_PATH.children}
             label="Çocuklara yaz"
-            description="Kendi sesinle onlara bir şeyler bırak."
+            description="Çocuklar panelinde listelenir."
             accent="border-l-4 border-l-[#8fa38e]"
           />
           <QuickLink
             href={WIFE_WRITE_PATH.grandchildren}
             label="Torunlara yaz"
-            description="Torunların panelinde görünecek yazılar."
+            description="Torunlar panelinde listelenir."
             accent="border-l-4 border-l-[#8fa38e]"
           />
         </div>
