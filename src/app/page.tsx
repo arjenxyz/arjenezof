@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Header } from "@/components/Header";
-import { SiteIntroText } from "@/components/SiteIntroText";
 import { SiteErrorPanel } from "@/components/SiteErrorPanel";
 import { SiteFooter } from "@/components/SiteFooter";
 import { TopicCard } from "@/components/TopicCard";
@@ -32,7 +31,13 @@ export default async function HomePage() {
         <Header />
         <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
           <section className="mb-8 max-w-3xl sm:mb-10">
-            <SiteIntroText />
+            <h2 className="font-serif text-2xl leading-tight text-stone-900 sm:text-3xl">
+              Hoş geldin.
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-stone-600 sm:text-base">
+              Son yazılara göz at, bir konu veya etiket seç — ya da aşağıdaki butonlarla hemen
+              başla.
+            </p>
             {allWritings.length > 0 && (
               <div className="mt-5 flex flex-wrap gap-3 sm:mt-6">
                 <Link
