@@ -19,7 +19,7 @@ export function SiteLayoutExtras() {
         <>
           <MobileBottomNav />
           <div
-            className="h-[calc(3.75rem+env(safe-area-inset-bottom,0px))] sm:hidden"
+            className="h-[calc(4rem+env(safe-area-inset-bottom,0px))] sm:hidden"
             aria-hidden="true"
           />
         </>
