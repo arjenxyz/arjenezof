@@ -5,9 +5,17 @@ import { wifeCanManageAudience } from "@/lib/family-shared";
 
 export type FamilyWriteActor = { kind: "admin" } | { kind: "wife" };
 
+/** Aile metin API'si — eş oturumu admin oturumundan önce gelir (aynı tarayıcı sorunu). */
+export async function getFamilyMessageWriteActor(): Promise<FamilyWriteActor | null> {
+  const familyRole = await getFamilySessionRole();
+  if (familyRole === "wife") return { kind: "wife" };
+  if (await isAuthenticated()) return { kind: "admin" };
+  return null;
+}
+
+/** Şifre yönetimi vb. — yalnızca site admini. */
 export async function getFamilyWriteActor(): Promise<FamilyWriteActor | null> {
   if (await isAuthenticated()) return { kind: "admin" };
-  if ((await getFamilySessionRole()) === "wife") return { kind: "wife" };
   return null;
 }
 

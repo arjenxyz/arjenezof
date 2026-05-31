@@ -157,6 +157,12 @@ export async function getFamilyMessageById(id: string) {
   return data ? mapMessage(data as MessageRow) : null;
 }
 
+export async function familyAuthorRoleReady() {
+  const supabase = createSupabaseAdmin();
+  const { error } = await supabase.from(FAMILY_MESSAGE_TABLE).select("authorRole").limit(1);
+  return !error;
+}
+
 export async function getFamilyMessagesByAuthor(authorRole: FamilyAuthorRole) {
   const supabase = createSupabaseAdmin();
   const { data, error } = await supabase

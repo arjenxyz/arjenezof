@@ -67,6 +67,7 @@ export function FamilyMessageForm({
     const response = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
       body: JSON.stringify(payload),
     });
 
@@ -86,7 +87,10 @@ export function FamilyMessageForm({
     if (!confirm("Bu yazıyı silmek istediğine emin misin?")) return;
 
     setLoading(true);
-    const response = await fetch(`/api/family/messages/${initial.id}`, { method: "DELETE" });
+    const response = await fetch(`/api/family/messages/${initial.id}`, {
+      method: "DELETE",
+      credentials: "same-origin",
+    });
     if (!response.ok) {
       const data = (await response.json()) as { error?: string };
       setError(data.error ?? "Silme işlemi başarısız oldu.");

@@ -2,14 +2,14 @@ import { NextResponse } from "next/server";
 import { deleteFamilyMessage, getFamilyMessageById, updateFamilyMessage } from "@/lib/family";
 import {
   actorCanManageMessage,
-  getFamilyWriteActor,
+  getFamilyMessageWriteActor,
 } from "@/lib/family-write-access";
 import { wifeCanManageAudience, type FamilyAudience } from "@/lib/family-shared";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function PUT(request: Request, { params }: Params) {
-  const actor = await getFamilyWriteActor();
+  const actor = await getFamilyMessageWriteActor();
   if (!actor) {
     return NextResponse.json({ error: "Yetkisiz." }, { status: 401 });
   }
@@ -56,7 +56,7 @@ export async function PUT(request: Request, { params }: Params) {
 }
 
 export async function DELETE(_request: Request, { params }: Params) {
-  const actor = await getFamilyWriteActor();
+  const actor = await getFamilyMessageWriteActor();
   if (!actor) {
     return NextResponse.json({ error: "Yetkisiz." }, { status: 401 });
   }

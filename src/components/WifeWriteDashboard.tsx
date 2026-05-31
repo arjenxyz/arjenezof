@@ -9,9 +9,10 @@ import {
 
 type Props = {
   messages: FamilyMessageRecord[];
+  authorReady?: boolean;
 };
 
-export function WifeWriteDashboard({ messages }: Props) {
+export function WifeWriteDashboard({ messages, authorReady = true }: Props) {
   const sections = WIFE_WRITE_AUDIENCES.map((audience) => ({
     audience,
     ...FAMILY_SECTIONS.wife[audience]!,
@@ -32,11 +33,17 @@ export function WifeWriteDashboard({ messages }: Props) {
       {messages.length === 0 ? (
         <div className="rounded-xl border border-dashed border-stone-300 bg-white/60 p-8 text-center text-stone-600">
           <p>Henüz bir yazı eklemedin.</p>
-          <p className="mt-2 text-sm text-stone-500">
-            Daha önce yazdığın metinler burada görünmüyorsa Supabase&apos;te{" "}
-            <code className="rounded bg-stone-100 px-1">family-author-migration.sql</code> dosyasını
-            çalıştırman gerekebilir.
-          </p>
+          {!authorReady ? (
+            <p className="mt-2 text-sm text-amber-800">
+              Önce yukarıdaki Supabase kurulumunu tamamla, sonra yeni yazı ekle.
+            </p>
+          ) : (
+            <p className="mt-2 text-sm text-stone-500">
+              Eski yazılar görünmüyorsa Arjen Supabase&apos;te{" "}
+              <code className="rounded bg-stone-100 px-1">authorRole</code> değerini{" "}
+              <code className="rounded bg-stone-100 px-1">wife</code> yapabilir.
+            </p>
+          )}
         </div>
       ) : (
         <div className="space-y-10">

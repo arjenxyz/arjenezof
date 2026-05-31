@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { createFamilyMessage } from "@/lib/family";
-import { getFamilyWriteActor } from "@/lib/family-write-access";
+import { getFamilyMessageWriteActor } from "@/lib/family-write-access";
 import { wifeCanManageAudience, type FamilyAudience } from "@/lib/family-shared";
 
 export async function POST(request: Request) {
-  const actor = await getFamilyWriteActor();
+  const actor = await getFamilyMessageWriteActor();
   if (!actor) {
     return NextResponse.json({ error: "Yetkisiz." }, { status: 401 });
   }
@@ -34,14 +34,38 @@ export async function POST(request: Request) {
     }
   }
 
-  const message = await createFamilyMessage({
-    title: body.title.trim(),
-    content: body.content.trim(),
-    audience: body.audience,
-    sortOrder: body.sortOrder ?? 0,
-    published: body.published ?? true,
-    authorRole: actor.kind === "wife" ? "wife" : "admin",
-  });
+  try {
+    const message = await createFamilyMessage({
+      title: body.title.trim(),
+      content: body.content.trim(),
+      audience: body.audience,
+      sortOrder: body.sortOrder ?? 0,
+      published: body.published ?? true,
+      authorRole: actor.kind === "wife" ? "wife" : "admin",
+    });
 
-  return NextResponse.json(message, { status: 201 });
+    if (actor.kind === "wife" && message.authorRole !== "wife") {
+      return NextResponse.json(
+        {
+          error:
+            "Yazı kaydedildi ama senin yazın olarak işaretlenemedi. Supabase'te family-author-migration.sql çalıştır; aynı tarayıcıda /admin oturumu açıksa kapatıp tekrar dene.",
+        },
+        { status: 500 },
+      );
+    }
+
+    return NextResponse.json(message, { status: 201 });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    if (msg.toLowerCase().includes("authorrole")) {
+      return NextResponse.json(
+        {
+          error:
+            "Veritabanında authorRole sütunu yok. Supabase SQL Editor'da supabase/family-author-migration.sql dosyasını çalıştır.",
+        },
+        { status: 500 },
+      );
+    }
+    throw error;
+  }
 }
