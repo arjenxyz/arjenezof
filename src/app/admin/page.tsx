@@ -47,6 +47,12 @@ export default async function AdminDashboardPage() {
               Sözler
             </Link>
             <Link
+              href="/admin/aile"
+              className="flex-1 rounded-lg border border-stone-300 px-4 py-2.5 text-center text-sm text-stone-700 transition hover:bg-stone-50 touch-manipulation sm:flex-none"
+            >
+              Aile
+            </Link>
+            <Link
               href="/admin/nodes/new"
               className="flex-1 rounded-lg bg-[#4a5d49] px-4 py-2.5 text-center text-sm font-medium text-white transition hover:bg-[#3d4d3c] touch-manipulation sm:flex-none"
             >
