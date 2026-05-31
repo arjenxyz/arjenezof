@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { familyMenuItemsForRole, type FamilyMenuItem, type FamilyRole } from "@/lib/family-shared";
 
 type Props = {
@@ -57,7 +58,12 @@ export function FamilyDrawerMenu({ role }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const items = familyMenuItemsForRole(role);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     setOpen(false);
@@ -86,6 +92,85 @@ export function FamilyDrawerMenu({ role }: Props) {
     router.refresh();
   }
 
+  const drawer =
+    open && mounted ? (
+      <div className="fixed inset-0 z-[100]">
+        <button
+          type="button"
+          className="absolute inset-0 bg-stone-900/25 backdrop-blur-md"
+          aria-label="Menüyü kapat"
+          onClick={() => setOpen(false)}
+        />
+        <nav
+          className="absolute right-0 top-0 z-10 flex h-[100dvh] w-[min(100%,20rem)] flex-col bg-white shadow-2xl"
+          aria-label="Aile menüsü"
+          style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+        >
+          <div className="flex shrink-0 items-center justify-between border-b border-stone-200 px-4 py-4">
+            <p className="text-sm font-medium text-stone-900">Menü</p>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-3 py-2 text-sm text-stone-600 hover:bg-stone-100 touch-manipulation"
+            >
+              Kapat
+            </button>
+          </div>
+
+          <ul className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3">
+            {items.map((item) => {
+              if (item.children?.length) {
+                const groupActive = isGroupActive(pathname, item);
+                return (
+                  <li key={item.id} className="mb-1">
+                    <p
+                      className={`px-4 py-2 text-xs font-semibold uppercase tracking-wide ${
+                        groupActive ? "text-[#4a5d49]" : "text-stone-400"
+                      }`}
+                    >
+                      {item.label}
+                    </p>
+                    <ul className="ml-3 space-y-0.5 border-l border-stone-200 pl-2">
+                      {item.children.map((child) => (
+                        <li key={child.id}>
+                          <MenuLink
+                            item={child}
+                            pathname={pathname}
+                            nested
+                            onNavigate={() => setOpen(false)}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                );
+              }
+
+              return (
+                <li key={item.id}>
+                  <MenuLink item={item} pathname={pathname} onNavigate={() => setOpen(false)} />
+                </li>
+              );
+            })}
+          </ul>
+
+          <div
+            className="shrink-0 border-t border-stone-200 bg-white p-3"
+            style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom, 0px))" }}
+          >
+            <button
+              type="button"
+              onClick={handleLogout}
+              disabled={loggingOut}
+              className="w-full rounded-xl px-4 py-3.5 text-left text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:opacity-60 touch-manipulation"
+            >
+              {loggingOut ? "Çıkış yapılıyor…" : "Çıkış yap"}
+            </button>
+          </div>
+        </nav>
+      </div>
+    ) : null;
+
   return (
     <>
       <button
@@ -101,90 +186,7 @@ export function FamilyDrawerMenu({ role }: Props) {
         <span className="hidden text-sm font-medium sm:inline">Menü</span>
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-[60]">
-          <button
-            type="button"
-            className="absolute inset-0 bg-stone-900/25 backdrop-blur-md"
-            aria-label="Menüyü kapat"
-            onClick={() => setOpen(false)}
-          />
-          <nav
-            className="absolute right-0 top-0 flex h-full w-[min(100%,20rem)] flex-col bg-white shadow-2xl"
-            aria-label="Aile menüsü"
-            style={{
-              paddingTop: "env(safe-area-inset-top, 0px)",
-              paddingBottom: "env(safe-area-inset-bottom, 0px)",
-            }}
-          >
-            <div className="flex items-center justify-between border-b border-stone-200 px-4 py-4">
-              <p className="text-sm font-medium text-stone-900">Menü</p>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm text-stone-600 hover:bg-stone-100 touch-manipulation"
-              >
-                Kapat
-              </button>
-            </div>
-
-            <ul className="flex-1 overflow-y-auto p-3">
-              {items.map((item) => {
-                if (item.children?.length) {
-                  const groupActive = isGroupActive(pathname, item);
-                  return (
-                    <li key={item.id} className="mb-1">
-                      <p
-                        className={`px-4 py-2 text-xs font-semibold uppercase tracking-wide ${
-                          groupActive ? "text-[#4a5d49]" : "text-stone-400"
-                        }`}
-                      >
-                        {item.label}
-                      </p>
-                      <ul className="ml-3 space-y-0.5 border-l border-stone-200 pl-2">
-                        {item.children.map((child) => (
-                          <li key={child.id}>
-                            <MenuLink
-                              item={child}
-                              pathname={pathname}
-                              nested
-                              onNavigate={() => setOpen(false)}
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    </li>
-                  );
-                }
-
-                return (
-                  <li key={item.id}>
-                    <MenuLink
-                      item={item}
-                      pathname={pathname}
-                      onNavigate={() => setOpen(false)}
-                    />
-                  </li>
-                );
-              })}
-            </ul>
-
-            <div
-              className="shrink-0 border-t border-stone-200 bg-white p-3"
-              style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom, 0px))" }}
-            >
-              <button
-                type="button"
-                onClick={handleLogout}
-                disabled={loggingOut}
-                className="w-full rounded-xl px-4 py-3 text-left text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:opacity-60 touch-manipulation"
-              >
-                {loggingOut ? "Çıkış yapılıyor…" : "Çıkış yap"}
-              </button>
-            </div>
-          </nav>
-        </div>
-      )}
+      {drawer && createPortal(drawer, document.body)}
     </>
   );
 }
