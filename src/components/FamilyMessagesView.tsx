@@ -13,12 +13,33 @@ type Props = {
   messages: FamilyMessageRecord[];
 };
 
-function MessageCard({ message }: { message: FamilyMessageRecord }) {
+function MessageCard({
+  message,
+  showOwnLabel,
+  readerRole,
+}: {
+  message: FamilyMessageRecord;
+  showOwnLabel?: boolean;
+  readerRole: FamilyRole;
+}) {
+  const familyAuthorLabel =
+    readerRole === "children" && message.authorRole === "wife"
+      ? "Annenden"
+      : readerRole === "grandchildren" && message.authorRole === "wife"
+        ? "Büyükannenden"
+        : null;
+
   return (
     <Link
       href={`/aile/metin/${message.id}`}
       className="block rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition hover:border-[#8fa38e] hover:shadow touch-manipulation sm:p-5"
     >
+      {showOwnLabel && message.authorRole === "wife" && (
+        <p className="mb-2 text-xs font-medium text-rose-700">Senin yazın</p>
+      )}
+      {familyAuthorLabel && (
+        <p className="mb-2 text-xs font-medium text-rose-700">{familyAuthorLabel}</p>
+      )}
       <h3 className="font-serif text-lg text-stone-900">{message.title}</h3>
       <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-stone-600">{message.content}</p>
       <p className="mt-3 text-xs text-stone-500">{formatDate(message.updatedAt)}</p>
@@ -43,7 +64,7 @@ export function FamilyMessagesView({ role, messages }: Props) {
       <ul className="mt-8 space-y-4">
         {messages.map((message) => (
           <li key={message.id}>
-            <MessageCard message={message} />
+            <MessageCard message={message} readerRole={role} />
           </li>
         ))}
       </ul>
@@ -77,7 +98,7 @@ export function FamilyMessagesView({ role, messages }: Props) {
               <ul className="mt-4 space-y-3">
                 {items.map((message) => (
                   <li key={message.id}>
-                    <MessageCard message={message} />
+                    <MessageCard message={message} showOwnLabel={role === "wife"} readerRole={role} />
                   </li>
                 ))}
               </ul>

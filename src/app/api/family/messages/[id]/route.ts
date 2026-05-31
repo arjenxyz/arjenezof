@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
-import { isAuthenticated } from "@/lib/auth";
 import { deleteFamilyMessage, getFamilyMessageById, updateFamilyMessage } from "@/lib/family";
-import type { FamilyAudience } from "@/lib/family-shared";
+import {
+  actorCanManageMessage,
+  getFamilyWriteActor,
+} from "@/lib/family-write-access";
+import { wifeCanManageAudience, type FamilyAudience } from "@/lib/family-shared";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function PUT(request: Request, { params }: Params) {
-  if (!(await isAuthenticated())) {
+  const actor = await getFamilyWriteActor();
+  if (!actor) {
     return NextResponse.json({ error: "Yetkisiz." }, { status: 401 });
   }
 
@@ -14,6 +18,10 @@ export async function PUT(request: Request, { params }: Params) {
   const existing = await getFamilyMessageById(id);
   if (!existing) {
     return NextResponse.json({ error: "Metin bulunamadı." }, { status: 404 });
+  }
+
+  if (!actorCanManageMessage(actor, existing)) {
+    return NextResponse.json({ error: "Bu metni düzenleme yetkin yok." }, { status: 403 });
   }
 
   const body = (await request.json()) as {
@@ -28,19 +36,28 @@ export async function PUT(request: Request, { params }: Params) {
     return NextResponse.json({ error: "Başlık, metin ve hedef kitle zorunludur." }, { status: 400 });
   }
 
+  if (actor.kind === "wife" && !wifeCanManageAudience(body.audience)) {
+    return NextResponse.json(
+      { error: "Yalnızca çocuklar ve torunlar için yazabilirsin." },
+      { status: 403 },
+    );
+  }
+
   const message = await updateFamilyMessage(id, {
     title: body.title.trim(),
     content: body.content.trim(),
     audience: body.audience,
     sortOrder: body.sortOrder ?? 0,
     published: body.published ?? true,
+    authorRole: existing.authorRole,
   });
 
   return NextResponse.json(message);
 }
 
 export async function DELETE(_request: Request, { params }: Params) {
-  if (!(await isAuthenticated())) {
+  const actor = await getFamilyWriteActor();
+  if (!actor) {
     return NextResponse.json({ error: "Yetkisiz." }, { status: 401 });
   }
 
@@ -48,6 +65,10 @@ export async function DELETE(_request: Request, { params }: Params) {
   const existing = await getFamilyMessageById(id);
   if (!existing) {
     return NextResponse.json({ error: "Metin bulunamadı." }, { status: 404 });
+  }
+
+  if (!actorCanManageMessage(actor, existing)) {
+    return NextResponse.json({ error: "Bu metni silme yetkin yok." }, { status: 403 });
   }
 
   await deleteFamilyMessage(id);

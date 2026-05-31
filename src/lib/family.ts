@@ -1,6 +1,7 @@
 import {
   canViewFamilyMessage,
   type FamilyAudience,
+  type FamilyAuthorRole,
   type FamilyRole,
 } from "@/lib/family-shared";
 import { hashFamilyPassword, verifyFamilyPassword } from "@/lib/family-auth";
@@ -16,6 +17,7 @@ export type FamilyMessageRecord = {
   audience: FamilyAudience;
   sortOrder: number;
   published: boolean;
+  authorRole: FamilyAuthorRole;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -27,6 +29,7 @@ type MessageRow = {
   audience: FamilyAudience;
   sortOrder: number;
   published: boolean;
+  authorRole?: FamilyAuthorRole;
   createdAt: string;
   updatedAt: string;
 };
@@ -45,6 +48,7 @@ function mapMessage(row: MessageRow): FamilyMessageRecord {
     audience: row.audience,
     sortOrder: row.sortOrder,
     published: row.published,
+    authorRole: row.authorRole ?? "admin",
     createdAt: new Date(row.createdAt),
     updatedAt: new Date(row.updatedAt),
   };
@@ -153,6 +157,11 @@ export async function getFamilyMessageById(id: string) {
   return data ? mapMessage(data as MessageRow) : null;
 }
 
+export async function getFamilyMessagesByAuthor(authorRole: FamilyAuthorRole) {
+  const messages = await getAllFamilyMessages();
+  return messages.filter((message) => message.authorRole === authorRole);
+}
+
 export async function getFamilyMessageForRole(id: string, role: FamilyRole) {
   const message = await getFamilyMessageById(id);
   if (!message || !message.published) return null;
@@ -166,6 +175,7 @@ type MessageInput = {
   audience: FamilyAudience;
   sortOrder?: number;
   published?: boolean;
+  authorRole?: FamilyAuthorRole;
 };
 
 export async function createFamilyMessage(input: MessageInput) {
@@ -181,6 +191,7 @@ export async function createFamilyMessage(input: MessageInput) {
       audience: input.audience,
       sortOrder: input.sortOrder ?? 0,
       published: input.published ?? true,
+      authorRole: input.authorRole ?? "admin",
       createdAt: now,
       updatedAt: now,
     })

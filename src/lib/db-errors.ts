@@ -112,13 +112,14 @@ export function getDatabaseErrorMessage(error: unknown): SiteErrorContent {
     msg.includes("thoughtnode") ||
     msg.includes("familymessage") ||
     msg.includes("familycredential") ||
+    msg.includes("authorrole") ||
     msg.includes("42p01")
   ) {
     return {
       title: "Veritabanı tablosu bulunamadı",
       message:
         "Gerekli tablo henüz oluşturulmamış görünüyor (Topic, ThoughtNode, Quote veya aile tabloları).",
-      hint: "Yeni kurulum: prisma/supabase-setup.sql. Mevcut veritabanı: supabase/topics-migration.sql, supabase/writings-and-quotes-migration.sql ve supabase/family-migration.sql dosyalarını Supabase SQL Editor'da çalıştır.",
+      hint: "Yeni kurulum: prisma/supabase-setup.sql. Mevcut veritabanı: supabase/topics-migration.sql, supabase/writings-and-quotes-migration.sql, supabase/family-migration.sql ve supabase/family-author-migration.sql dosyalarını Supabase SQL Editor'da çalıştır.",
     };
   }
 

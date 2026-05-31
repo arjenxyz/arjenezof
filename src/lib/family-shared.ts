@@ -1,7 +1,11 @@
 export type FamilyAudience = "wife" | "children" | "grandchildren";
 export type FamilyRole = FamilyAudience;
+export type FamilyAuthorRole = "admin" | "wife";
 
 export const FAMILY_AUDIENCES: FamilyAudience[] = ["wife", "children", "grandchildren"];
+
+export const WIFE_WRITE_AUDIENCES = ["children", "grandchildren"] as const;
+export type WifeWriteAudience = (typeof WIFE_WRITE_AUDIENCES)[number];
 
 export const FAMILY_LABELS: Record<FamilyAudience, string> = {
   wife: "Eş",
@@ -16,7 +20,7 @@ export const FAMILY_GREETINGS: Record<FamilyRole, string> = {
 };
 
 export const FAMILY_INTRO: Record<FamilyRole, string> = {
-  wife: "Arjen'in sana ve aileye yazdığı metinler burada. Her bölüm ayrı — karıştırmana gerek yok.",
+  wife: "Arjen'in sana ve aileye yazdığı metinler burada. İstersen çocuklar ve torunlar için de yazabilirsin.",
   children: "Babaannene ve kardeşlerine yazılan metinler burada.",
   grandchildren: "Büyükannene ve büyükbabandan sana yazılan metinler burada.",
 };
@@ -71,6 +75,15 @@ export const FAMILY_ADMIN_HINTS: Record<FamilyAudience, string> = {
   children: "Eş ve tüm çocuklar görür; torunlar görmez.",
   grandchildren: "Eş, çocuklar ve torunlar görür.",
 };
+
+export const WIFE_WRITE_HINTS: Record<WifeWriteAudience, string> = {
+  children: "Tüm çocuklarınız kendi şifreleriyle bunu okur.",
+  grandchildren: "Tüm torunlarınız kendi şifreleriyle bunu okur.",
+};
+
+export function wifeCanManageAudience(audience: FamilyAudience): audience is WifeWriteAudience {
+  return (WIFE_WRITE_AUDIENCES as readonly FamilyAudience[]).includes(audience);
+}
 
 export function canViewFamilyMessage(viewerRole: FamilyRole, audience: FamilyAudience) {
   if (viewerRole === "wife") return true;

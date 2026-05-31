@@ -18,16 +18,17 @@ async function verifyAdminSession(token: string, secret: string) {
   }
 }
 
-async function verifyFamilySession(token: string, secret: string) {
+async function getFamilyRole(token: string, secret: string) {
   try {
     const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
-    if (payload.role !== "family") return false;
+    if (payload.role !== "family") return null;
     const familyRole = payload.familyRole;
-    return (
-      familyRole === "wife" || familyRole === "children" || familyRole === "grandchildren"
-    );
+    if (familyRole === "wife" || familyRole === "children" || familyRole === "grandchildren") {
+      return familyRole;
+    }
+    return null;
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -49,12 +50,23 @@ export async function middleware(request: NextRequest) {
   }
 
   const needsFamilyAuth =
-    pathname === "/aile/metinler" || pathname.startsWith("/aile/metin/");
+    pathname === "/aile/metinler" ||
+    pathname.startsWith("/aile/metin/") ||
+    pathname.startsWith("/aile/yaz");
 
   if (needsFamilyAuth) {
     const token = request.cookies.get(FAMILY_COOKIE)?.value;
-    if (!token || !secret || !(await verifyFamilySession(token, secret))) {
+    if (!token || !secret) {
       return NextResponse.redirect(new URL("/aile", request.url));
+    }
+
+    const familyRole = await getFamilyRole(token, secret);
+    if (!familyRole) {
+      return NextResponse.redirect(new URL("/aile", request.url));
+    }
+
+    if (pathname.startsWith("/aile/yaz") && familyRole !== "wife") {
+      return NextResponse.redirect(new URL("/aile/metinler", request.url));
     }
   }
 
@@ -62,5 +74,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/aile/metinler", "/aile/metin/:path*"],
+  matcher: ["/admin/:path*", "/aile/metinler", "/aile/metin/:path*", "/aile/yaz/:path*"],
 };

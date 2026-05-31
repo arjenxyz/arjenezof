@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { isAuthenticated } from "@/lib/auth";
 import { createFamilyMessage } from "@/lib/family";
-import type { FamilyAudience } from "@/lib/family-shared";
+import { getFamilyWriteActor } from "@/lib/family-write-access";
+import { wifeCanManageAudience, type FamilyAudience } from "@/lib/family-shared";
 
 export async function POST(request: Request) {
-  if (!(await isAuthenticated())) {
+  const actor = await getFamilyWriteActor();
+  if (!actor) {
     return NextResponse.json({ error: "Yetkisiz." }, { status: 401 });
   }
 
@@ -24,12 +25,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Geçersiz hedef kitle." }, { status: 400 });
   }
 
+  if (actor.kind === "wife") {
+    if (!wifeCanManageAudience(body.audience)) {
+      return NextResponse.json(
+        { error: "Yalnızca çocuklar ve torunlar için yazabilirsin." },
+        { status: 403 },
+      );
+    }
+  }
+
   const message = await createFamilyMessage({
     title: body.title.trim(),
     content: body.content.trim(),
     audience: body.audience,
     sortOrder: body.sortOrder ?? 0,
     published: body.published ?? true,
+    authorRole: actor.kind === "wife" ? "wife" : "admin",
   });
 
   return NextResponse.json(message, { status: 201 });
